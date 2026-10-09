@@ -1,7 +1,7 @@
 /* ═══════════════════════════════════════════════════════════════
-   TRACE — ALL-SEEING OSINT INTELLIGENCE ENGINE (APP LOGIC)
-   Interactive Canvas Topology, EXIF GPS Inspector, DNS Audit,
-   Live Search Filtering, Removal Tracker & PDF Printing
+   TRACE — ALL-SEEING OSINT & RELATIVES ENGINE (APP LOGIC)
+   Interactive Canvas Topology, Phone Reverse Recon, Relatives Kinship,
+   EXIF GPS Inspector, DNS Audit & PDF Printing
    ═══════════════════════════════════════════════════════════════ */
 
 (function () {
@@ -11,6 +11,7 @@
   const scanForm = document.getElementById('scanForm');
   const nameInput = document.getElementById('nameInput');
   const emailInput = document.getElementById('emailInput');
+  const phoneInput = document.getElementById('phoneInput');
   const usernamesInput = document.getElementById('usernamesInput');
   const imageInput = document.getElementById('imageInput');
   const imageDropZone = document.getElementById('imageDropZone');
@@ -42,14 +43,9 @@
   const accountSearchFilter = document.getElementById('accountSearchFilter');
   const accountCategoryFilter = document.getElementById('accountCategoryFilter');
 
-  // ── State ──
   let currentResults = null;
   let selectedFile = null;
   let removedAccountIds = new Set(JSON.parse(localStorage.getItem('trace_removed_accounts') || '[]'));
-
-  // ═══════════════════════════════════════════════════════════════
-  // FILE UPLOAD MANAGEMENT
-  // ═══════════════════════════════════════════════════════════════
 
   imageDropZone.addEventListener('click', () => imageInput.click());
 
@@ -108,19 +104,16 @@
     return (bytes / (1024 * 1024)).toFixed(1) + ' MB';
   }
 
-  // ═══════════════════════════════════════════════════════════════
-  // SCAN SUBMISSION & ANIMATION
-  // ═══════════════════════════════════════════════════════════════
-
   scanForm.addEventListener('submit', async (e) => {
     e.preventDefault();
 
     const name = nameInput.value.trim();
     const email = emailInput.value.trim();
+    const phone = phoneInput ? phoneInput.value.trim() : '';
     const customUsernames = usernamesInput.value.trim();
 
-    if (!name && !email) {
-      showToast('Please provide at least a target name or email address.', 'error');
+    if (!name && !email && !phone) {
+      showToast('Please provide at least a target name, email, or phone number.', 'error');
       return;
     }
 
@@ -130,6 +123,7 @@
       const formData = new FormData();
       if (name) formData.append('name', name);
       if (email) formData.append('email', email);
+      if (phone) formData.append('phone', phone);
       if (customUsernames) formData.append('customUsernames', customUsernames);
       if (selectedFile) formData.append('image', selectedFile);
 
@@ -152,7 +146,7 @@
       await completeProgress();
       renderResults(data);
 
-      showToast(`Scan complete! Discovered ${data.socialAccounts.length} profiles & ${data.webResults.length} web hits.`, 'success');
+      showToast(`Deep scan complete! Discovered ${data.socialAccounts.length} profiles & ${data.webResults.length} web hits.`, 'success');
 
     } catch (err) {
       console.error('Scan execution error:', err);
@@ -174,14 +168,16 @@
       step.querySelector('i').className = 'far fa-circle';
     });
 
-    const firstStep = document.getElementById('step-exif');
-    firstStep.classList.add('active');
-    firstStep.querySelector('i').className = 'fas fa-circle-notch fa-spin';
+    const firstStep = document.getElementById('step-phone');
+    if (firstStep) {
+      firstStep.classList.add('active');
+      firstStep.querySelector('i').className = 'fas fa-circle-notch fa-spin';
+    }
   }
 
   function simulateProgress() {
     let progress = 0;
-    const steps = ['exif', 'social', 'web', 'dns', 'breach', 'ai'];
+    const steps = ['phone', 'relatives', 'exif', 'social', 'web', 'ai'];
     let currentStepIdx = 0;
 
     return setInterval(() => {
@@ -233,7 +229,7 @@
   function endScanUI() {
     scanBtn.disabled = false;
     scanBtn.classList.remove('scanning');
-    scanBtnText.textContent = 'Activate All-Seeing Radar';
+    scanBtnText.textContent = 'Activate All-Seeing Deep Radar';
     scanBtnIcon.className = 'fas fa-crosshairs';
   }
 
@@ -264,10 +260,11 @@
     document.getElementById('badgeAccounts').textContent = accountsCount;
     document.getElementById('badgeWeb').textContent = webCount;
 
-    // Draw Topology Canvas Graph
     drawTopologyGraph(data);
 
     renderAccounts(data.socialAccounts);
+    renderPhoneAudit(data.phoneAudit);
+    renderRelatives(data.relativesOSINT);
     renderAIAnalysis(data.aiAnalysis);
     renderEXIF(data.exifInfo);
     renderDNS(data.dnsAudit);
@@ -275,7 +272,6 @@
     renderBreachLinks(data.breachLinks);
     renderDataBrokers(data.dataBrokerLinks);
     renderRemovalLinks(data.removalLinks);
-    renderImageSearch(data);
   }
 
   function animateNumber(elementId, target) {
@@ -295,10 +291,7 @@
     requestAnimationFrame(update);
   }
 
-  // ═══════════════════════════════════════════════════════════════
-  // INTERACTIVE CANVAS NODE GRAPH TOPOLOGY
-  // ═══════════════════════════════════════════════════════════════
-
+  // Draw Topology Canvas Graph
   function drawTopologyGraph(data) {
     const canvas = document.getElementById('cyberGraphCanvas');
     if (!canvas) return;
@@ -309,14 +302,12 @@
     const nodes = [];
     const links = [];
 
-    // Target Node
-    const centerNode = { id: 'target', label: data.input.name || data.input.email || 'Target', x: width / 2, y: height / 2, radius: 26, color: '#3b82f6', isCenter: true };
+    const centerNode = { id: 'target', label: data.input.name || data.input.email || data.input.phone || 'Target', x: width / 2, y: height / 2, radius: 26, color: '#3b82f6', isCenter: true };
     nodes.push(centerNode);
 
-    // Platform Nodes
-    data.socialAccounts.slice(0, 14).forEach((acc, i) => {
-      const angle = (i / Math.min(14, data.socialAccounts.length)) * Math.PI * 2;
-      const dist = 130 + Math.random() * 30;
+    data.socialAccounts.slice(0, 12).forEach((acc, i) => {
+      const angle = (i / Math.min(12, data.socialAccounts.length)) * Math.PI * 2;
+      const dist = 130 + Math.random() * 25;
       const node = {
         id: `acc_${i}`,
         label: acc.platform,
@@ -329,27 +320,24 @@
       links.push({ from: centerNode, to: node });
     });
 
-    // Web / Leak Nodes
-    if (data.webResults.length > 0) {
-      const webNode = { id: 'web_cluster', label: `${data.webResults.length} Web Hits`, x: width / 2 - 240, y: height / 2 - 80, radius: 18, color: '#06b6d4' };
-      nodes.push(webNode);
-      links.push({ from: centerNode, to: webNode });
+    if (data.phoneAudit) {
+      const phoneNode = { id: 'phone_node', label: 'Phone Recon', x: width / 2 - 240, y: height / 2 + 80, radius: 18, color: '#f59e0b' };
+      nodes.push(phoneNode);
+      links.push({ from: centerNode, to: phoneNode });
     }
 
-    if (data.exifInfo && data.exifInfo.gps) {
-      const gpsNode = { id: 'gps_node', label: 'GPS Geotag', x: width / 2 + 240, y: height / 2 - 80, radius: 18, color: '#ef4444' };
-      nodes.push(gpsNode);
-      links.push({ from: centerNode, to: gpsNode });
+    if (data.relativesOSINT && data.relativesOSINT.length > 0) {
+      const relNode = { id: 'rel_node', label: 'Relatives Network', x: width / 2 + 240, y: height / 2 + 80, radius: 18, color: '#ec4899' };
+      nodes.push(relNode);
+      links.push({ from: centerNode, to: relNode });
     }
 
-    let animFrame;
     let tick = 0;
 
     function renderGraph() {
       ctx.clearRect(0, 0, width, height);
       tick += 0.02;
 
-      // Draw Links
       links.forEach(link => {
         ctx.beginPath();
         ctx.moveTo(link.from.x, link.from.y);
@@ -358,7 +346,6 @@
         ctx.lineWidth = 1.5;
         ctx.stroke();
 
-        // Pulsing signals
         const pulseRatio = (Math.sin(tick + link.to.x) + 1) / 2;
         const pulseX = link.from.x + (link.to.x - link.from.x) * pulseRatio;
         const pulseY = link.from.y + (link.to.y - link.from.y) * pulseRatio;
@@ -369,7 +356,6 @@
         ctx.fill();
       });
 
-      // Draw Nodes
       nodes.forEach(node => {
         ctx.beginPath();
         ctx.arc(node.x, node.y, node.radius, 0, Math.PI * 2);
@@ -385,13 +371,12 @@
         ctx.fillText(node.label, node.x, node.y + node.radius + 14);
       });
 
-      animFrame = requestAnimationFrame(renderGraph);
+      requestAnimationFrame(renderGraph);
     }
 
     renderGraph();
   }
 
-  // ── Render Accounts Grid & Filter Handler ──
   function renderAccounts(accounts) {
     const grid = document.getElementById('accountsGrid');
     const searchVal = accountSearchFilter.value.toLowerCase().trim();
@@ -412,7 +397,6 @@
         <div class="empty-state" style="grid-column: 1/-1; padding: 40px; text-align: center; color: var(--text-muted);">
           <i class="fas fa-user-slash" style="font-size: 40px; margin-bottom: 12px; display: block;"></i>
           <h3>No Profiles Matching Filter</h3>
-          <p>Try clearing your search query or choosing another category.</p>
         </div>`;
       return;
     }
@@ -472,14 +456,95 @@
     if (currentResults) renderAccounts(currentResults.socialAccounts);
   };
 
+  // ── Render Phone Audit ──
+  function renderPhoneAudit(phone) {
+    const container = document.getElementById('phoneContent');
+
+    if (!phone) {
+      container.innerHTML = `
+        <div class="empty-state" style="padding: 40px; text-align: center; color: var(--text-muted);">
+          <i class="fas fa-phone-slash" style="font-size: 40px; margin-bottom: 12px; display: block;"></i>
+          <h3>No Phone Number Target Provided</h3>
+          <p>Provide a target phone number in the scan form to run reverse phone lookup.</p>
+        </div>`;
+      return;
+    }
+
+    container.innerHTML = `
+      <div style="background: var(--bg-card); border: 1px solid var(--border-primary); border-radius: 16px; padding: 24px;">
+        <h3 style="font-size: 18px; font-weight: 700; margin-bottom: 8px; color: var(--accent-orange);">
+          <i class="fas fa-phone-volume"></i> Phone Intelligence & Carrier Analysis
+        </h3>
+        <p style="font-size: 14px; color: var(--text-secondary); margin-bottom: 20px;">
+          Clean Format: <strong style="font-family: 'JetBrains Mono', monospace; color: var(--text-primary);">${escapeHtml(phone.cleanPhone)}</strong> • Region: <strong style="color: var(--accent-cyan);">${escapeHtml(phone.country)}</strong>
+        </p>
+
+        <div class="links-grid">
+          ${phone.reverseLookupLinks.map(link => `
+            <div class="link-card">
+              <div style="display: flex; align-items: center; gap: 12px;">
+                <div style="width: 40px; height: 40px; border-radius: 8px; background: rgba(245, 158, 11, 0.15); color: var(--accent-orange); display: flex; align-items: center; justify-content: center; font-size: 18px;">
+                  <i class="${link.icon}"></i>
+                </div>
+                <span style="font-weight: 700; font-size: 15px;">${escapeHtml(link.name)}</span>
+              </div>
+              <p style="font-size: 13px; color: var(--text-secondary); flex: 1;">${escapeHtml(link.description)}</p>
+              <a href="${escapeHtml(link.url)}" target="_blank" rel="noopener" class="link-card-action" style="background: rgba(245, 158, 11, 0.12); border: 1px solid rgba(245, 158, 11, 0.3); color: var(--accent-orange);">
+                <i class="fas fa-search"></i> Reverse Lookup
+              </a>
+            </div>
+          `).join('')}
+        </div>
+      </div>
+    `;
+  }
+
+  // ── Render Relatives & Kinship OSINT ──
+  function renderRelatives(relatives) {
+    const container = document.getElementById('relativesContent');
+
+    if (!relatives || relatives.length === 0) {
+      container.innerHTML = `
+        <div class="empty-state" style="padding: 40px; text-align: center; color: var(--text-muted);">
+          <i class="fas fa-users-slash" style="font-size: 40px; margin-bottom: 12px; display: block;"></i>
+          <h3>No Target Name Provided for Relatives Recon</h3>
+        </div>`;
+      return;
+    }
+
+    container.innerHTML = `
+      <div style="background: var(--bg-card); border: 1px solid var(--border-primary); border-radius: 16px; padding: 24px;">
+        <h3 style="font-size: 18px; font-weight: 700; margin-bottom: 8px; color: var(--accent-pink);">
+          <i class="fas fa-people-roof"></i> Relatives, Co-habitants & Family Kinship Network
+        </h3>
+        <p style="font-size: 14px; color: var(--text-secondary); margin-bottom: 20px;">
+          Queries public genealogy records, household databases, and associated family links to map kinship ties.
+        </p>
+
+        <div class="links-grid">
+          ${relatives.map(link => `
+            <div class="link-card">
+              <div style="display: flex; align-items: center; gap: 12px;">
+                <div style="width: 40px; height: 40px; border-radius: 8px; background: rgba(236, 72, 153, 0.15); color: var(--accent-pink); display: flex; align-items: center; justify-content: center; font-size: 18px;">
+                  <i class="${link.icon}"></i>
+                </div>
+                <span style="font-weight: 700; font-size: 15px;">${escapeHtml(link.name)}</span>
+              </div>
+              <p style="font-size: 13px; color: var(--text-secondary); flex: 1;">${escapeHtml(link.description)}</p>
+              <a href="${escapeHtml(link.url)}" target="_blank" rel="noopener" class="link-card-action" style="background: rgba(236, 72, 153, 0.12); border: 1px solid rgba(236, 72, 153, 0.3); color: var(--accent-pink);">
+                <i class="fas fa-sitemap"></i> Map Kinship Connections
+              </a>
+            </div>
+          `).join('')}
+        </div>
+      </div>
+    `;
+  }
+
   // ── Render AI Analysis ──
   function renderAIAnalysis(ai) {
     const container = document.getElementById('aiAnalysisContent');
-
-    if (!ai) {
-      container.innerHTML = `<div class="empty-state">No AI analysis generated.</div>`;
-      return;
-    }
+    if (!ai) return;
 
     container.innerHTML = `
       <div class="ai-card">
@@ -513,7 +578,6 @@
           <div style="display: flex; gap: 10px; margin-bottom: 12px;">
             <button class="btn-export active" id="noticeGdprBtn"><i class="fas fa-gavel"></i> GDPR Notice</button>
             <button class="btn-export" id="noticeCcpaBtn"><i class="fas fa-balance-scale"></i> CCPA Notice</button>
-            <button class="btn-export" id="noticeDmcaBtn"><i class="fas fa-copyright"></i> DMCA Notice</button>
           </div>
           <div class="ai-legal-box" id="legalNoticeBox">
             <button class="btn-copy-legal" id="copyLegalBtn">
@@ -526,35 +590,21 @@
     `;
 
     const noticeText = document.getElementById('legalNoticeText');
-    document.getElementById('noticeGdprBtn').addEventListener('click', (e) => {
-      noticeText.textContent = ai.legalNotices.gdpr;
-      showToast('Switched to GDPR Article 17 Notice.', 'info');
-    });
-    document.getElementById('noticeCcpaBtn').addEventListener('click', (e) => {
-      noticeText.textContent = ai.legalNotices.ccpa;
-      showToast('Switched to CCPA Opt-Out Notice.', 'info');
-    });
-    document.getElementById('noticeDmcaBtn').addEventListener('click', (e) => {
-      noticeText.textContent = ai.legalNotices.dmca;
-      showToast('Switched to DMCA Takedown Notice.', 'info');
-    });
-
+    document.getElementById('noticeGdprBtn').addEventListener('click', () => { noticeText.textContent = ai.legalNotices.gdpr; });
+    document.getElementById('noticeCcpaBtn').addEventListener('click', () => { noticeText.textContent = ai.legalNotices.ccpa; });
     document.getElementById('copyLegalBtn').addEventListener('click', () => {
       navigator.clipboard.writeText(noticeText.textContent);
       showToast('Legal Notice copied to clipboard!', 'success');
     });
   }
 
-  // ── Render Photo EXIF & GPS ──
   function renderEXIF(exif) {
     const container = document.getElementById('exifContent');
-
     if (!exif || !exif.hasExif) {
       container.innerHTML = `
         <div class="empty-state" style="padding: 40px; text-align: center; color: var(--text-muted);">
           <i class="fas fa-camera-retro" style="font-size: 40px; margin-bottom: 12px; display: block;"></i>
           <h3>No Photo EXIF Metadata Found</h3>
-          <p>Either no photo was uploaded or the uploaded photo has stripped metadata.</p>
         </div>`;
       return;
     }
@@ -569,7 +619,6 @@
             ${exif.cameraMake ? `<tr><th style="padding: 8px; text-align: left; color: var(--text-muted);">Camera Make</th><td style="padding: 8px;">${escapeHtml(exif.cameraMake)}</td></tr>` : ''}
             ${exif.cameraModel ? `<tr><th style="padding: 8px; text-align: left; color: var(--text-muted);">Camera Model</th><td style="padding: 8px;">${escapeHtml(exif.cameraModel)}</td></tr>` : ''}
             ${exif.createDate ? `<tr><th style="padding: 8px; text-align: left; color: var(--text-muted);">Original Date</th><td style="padding: 8px;">${escapeHtml(exif.createDate)}</td></tr>` : ''}
-            ${exif.software ? `<tr><th style="padding: 8px; text-align: left; color: var(--text-muted);">Software</th><td style="padding: 8px;">${escapeHtml(exif.software)}</td></tr>` : ''}
             ${exif.imageWidth ? `<tr><th style="padding: 8px; text-align: left; color: var(--text-muted);">Resolution</th><td style="padding: 8px;">${exif.imageWidth} x ${exif.imageHeight} px</td></tr>` : ''}
           </tbody>
         </table>`;
@@ -591,29 +640,17 @@
     container.innerHTML = html;
   }
 
-  // ── Render DNS Audit ──
   function renderDNS(dns) {
     const container = document.getElementById('dnsContent');
-
     if (!dns || dns.error) {
-      container.innerHTML = `
-        <div class="empty-state" style="padding: 40px; text-align: center; color: var(--text-muted);">
-          <i class="fas fa-shield-halved" style="font-size: 40px; margin-bottom: 12px; display: block;"></i>
-          <h3>No Custom Email Domain Audit</h3>
-          <p>DNS security audit is run on custom email domains (e.g. company.com).</p>
-        </div>`;
+      container.innerHTML = `<div class="empty-state" style="padding: 40px; text-align: center; color: var(--text-muted);"><i class="fas fa-shield-halved" style="font-size: 40px; margin-bottom: 12px; display: block;"></i><h3>No Custom Email Domain Audit</h3></div>`;
       return;
     }
 
     container.innerHTML = `
       <div style="background: var(--bg-card); border: 1px solid var(--border-primary); border-radius: 16px; padding: 24px;">
-        <h3 style="font-size: 18px; font-weight: 700; margin-bottom: 16px; color: var(--accent-blue);">
-          <i class="fas fa-server"></i> Domain DNS & Email Authentication Audit
-        </h3>
-        <p style="font-size: 14px; color: var(--text-secondary); margin-bottom: 16px;">Target Domain: <strong>${escapeHtml(dns.domain)}</strong></p>
-        <div style="margin-bottom: 16px;">
-          <strong>Security Rating:</strong> <span style="color: ${dns.hasSpf && dns.hasDmarc ? 'var(--accent-green)' : 'var(--accent-orange)'}">${escapeHtml(dns.securityRating)}</span>
-        </div>
+        <h3 style="font-size: 18px; font-weight: 700; margin-bottom: 16px; color: var(--accent-blue);"><i class="fas fa-server"></i> Domain DNS Audit</h3>
+        <p style="font-size: 14px; color: var(--text-secondary); margin-bottom: 16px;">Domain: <strong>${escapeHtml(dns.domain)}</strong></p>
         <div style="background: var(--bg-tertiary); padding: 16px; border-radius: 12px; font-family: 'JetBrains Mono', monospace; font-size: 13px;">
           <div><strong>MX Servers:</strong> ${escapeHtml((dns.mxRecords || []).join(', ') || 'None')}</div>
           <div style="margin-top: 8px;"><strong>SPF Record:</strong> ${escapeHtml(dns.spfRecord || 'Missing')}</div>
@@ -622,159 +659,67 @@
       </div>`;
   }
 
-  // ── Render Web Search Results ──
   function renderWebResults(results) {
     const list = document.getElementById('webResultsList');
-
     if (!results || results.length === 0) {
-      list.innerHTML = `
-        <div class="empty-state" style="padding: 40px; text-align: center; color: var(--text-muted);">
-          <i class="fas fa-search" style="font-size: 40px; margin-bottom: 12px; display: block;"></i>
-          <h3>No Web Mentions Discovered</h3>
-          <p>No search engine hits were found for the provided query.</p>
-        </div>`;
+      list.innerHTML = `<div class="empty-state" style="padding: 40px; text-align: center; color: var(--text-muted);"><i class="fas fa-search" style="font-size: 40px; margin-bottom: 12px; display: block;"></i><h3>No Web Hits Discovered</h3></div>`;
       return;
     }
-
     const seen = new Set();
-    const unique = results.filter(r => {
-      if (seen.has(r.url)) return false;
-      seen.add(r.url);
-      return true;
-    });
-
+    const unique = results.filter(r => { if (seen.has(r.url)) return false; seen.add(r.url); return true; });
     list.innerHTML = unique.map(result => `
       <div class="web-result-card">
-        <div class="web-result-title">
-          <a href="${escapeHtml(result.url)}" target="_blank" rel="noopener">${escapeHtml(result.title)}</a>
-        </div>
+        <div class="web-result-title"><a href="${escapeHtml(result.url)}" target="_blank" rel="noopener">${escapeHtml(result.title)}</a></div>
         <div class="web-result-url">${escapeHtml(result.url)}</div>
         ${result.snippet ? `<div style="font-size: 14px; color: var(--text-secondary); line-height: 1.5;">${escapeHtml(result.snippet)}</div>` : ''}
       </div>
     `).join('');
   }
 
-  // ── Render Data Breach Links ──
   function renderBreachLinks(links) {
     const grid = document.getElementById('breachesGrid');
-
-    if (!links || links.length === 0) {
-      grid.innerHTML = `
-        <div class="empty-state" style="grid-column: 1/-1; padding: 40px; text-align: center; color: var(--text-muted);">
-          <i class="fas fa-database" style="font-size: 40px; margin-bottom: 12px; display: block;"></i>
-          <h3>Email Address Required</h3>
-          <p>Please enter an email address to query global breach databases.</p>
-        </div>`;
-      return;
-    }
-
+    if (!links) return;
     grid.innerHTML = links.map(link => `
       <div class="link-card">
         <div style="display: flex; align-items: center; gap: 12px;">
-          <div style="width: 40px; height: 40px; border-radius: 8px; background: rgba(239, 68, 68, 0.15); color: var(--accent-red); display: flex; align-items: center; justify-content: center; font-size: 18px;">
-            <i class="${link.icon}"></i>
-          </div>
+          <div style="width: 40px; height: 40px; border-radius: 8px; background: rgba(239, 68, 68, 0.15); color: var(--accent-red); display: flex; align-items: center; justify-content: center; font-size: 18px;"><i class="${link.icon}"></i></div>
           <span style="font-weight: 700; font-size: 15px;">${escapeHtml(link.name)}</span>
         </div>
         <p style="font-size: 13px; color: var(--text-secondary); flex: 1;">${escapeHtml(link.description)}</p>
-        <a href="${escapeHtml(link.url)}" target="_blank" rel="noopener" class="link-card-action breach-link">
-          <i class="fas fa-external-link-alt"></i> Query Leak Database
-        </a>
+        <a href="${escapeHtml(link.url)}" target="_blank" rel="noopener" class="link-card-action breach-link"><i class="fas fa-external-link-alt"></i> Query Leak Database</a>
       </div>
     `).join('');
   }
 
-  // ── Render Data Brokers ──
   function renderDataBrokers(links) {
     const grid = document.getElementById('dataBrokersGrid');
     if (!links) return;
-
     grid.innerHTML = links.map(link => `
       <div class="link-card">
         <div style="display: flex; align-items: center; gap: 12px;">
-          <div style="width: 40px; height: 40px; border-radius: 8px; background: rgba(245, 158, 11, 0.15); color: var(--accent-orange); display: flex; align-items: center; justify-content: center; font-size: 18px;">
-            <i class="${link.icon}"></i>
-          </div>
+          <div style="width: 40px; height: 40px; border-radius: 8px; background: rgba(245, 158, 11, 0.15); color: var(--accent-orange); display: flex; align-items: center; justify-content: center; font-size: 18px;"><i class="${link.icon}"></i></div>
           <span style="font-weight: 700; font-size: 15px;">${escapeHtml(link.name)}</span>
         </div>
         <p style="font-size: 13px; color: var(--text-secondary); flex: 1;">${escapeHtml(link.description)}</p>
-        <a href="${escapeHtml(link.url)}" target="_blank" rel="noopener" class="link-card-action" style="background: rgba(245, 158, 11, 0.12); border: 1px solid rgba(245, 158, 11, 0.3); color: var(--accent-orange);">
-          <i class="fas fa-user-slash"></i> Opt-Out Page
-        </a>
+        <a href="${escapeHtml(link.url)}" target="_blank" rel="noopener" class="link-card-action" style="background: rgba(245, 158, 11, 0.12); border: 1px solid rgba(245, 158, 11, 0.3); color: var(--accent-orange);"><i class="fas fa-user-slash"></i> Opt-Out Page</a>
       </div>
     `).join('');
   }
 
-  // ── Render Search Removal ──
   function renderRemovalLinks(links) {
     const grid = document.getElementById('removalGrid');
     if (!links) return;
-
     grid.innerHTML = links.map(link => `
       <div class="link-card">
         <div style="display: flex; align-items: center; gap: 12px;">
-          <div style="width: 40px; height: 40px; border-radius: 8px; background: rgba(16, 185, 129, 0.15); color: var(--accent-green); display: flex; align-items: center; justify-content: center; font-size: 18px;">
-            <i class="${link.icon}"></i>
-          </div>
+          <div style="width: 40px; height: 40px; border-radius: 8px; background: rgba(16, 185, 129, 0.15); color: var(--accent-green); display: flex; align-items: center; justify-content: center; font-size: 18px;"><i class="${link.icon}"></i></div>
           <span style="font-weight: 700; font-size: 15px;">${escapeHtml(link.name)}</span>
         </div>
         <p style="font-size: 13px; color: var(--text-secondary); flex: 1;">${escapeHtml(link.description)}</p>
-        <a href="${escapeHtml(link.url)}" target="_blank" rel="noopener" class="link-card-action" style="background: rgba(16, 185, 129, 0.12); border: 1px solid rgba(16, 185, 129, 0.3); color: var(--accent-green);">
-          <i class="fas fa-external-link-alt"></i> Removal Form
-        </a>
+        <a href="${escapeHtml(link.url)}" target="_blank" rel="noopener" class="link-card-action" style="background: rgba(16, 185, 129, 0.12); border: 1px solid rgba(16, 185, 129, 0.3); color: var(--accent-green);"><i class="fas fa-external-link-alt"></i> Removal Form</a>
       </div>
     `).join('');
   }
-
-  // ── Render Visual Lens ──
-  function renderImageSearch(data) {
-    const container = document.getElementById('imageSearchContent');
-
-    if (data.reverseImageLinks && data.reverseImageLinks.length > 0) {
-      let html = '';
-      if (data.uploadedImagePath) {
-        html += `
-          <div style="text-align: center; margin-bottom: 24px;">
-            <img src="${escapeHtml(data.uploadedImagePath)}" 
-                 style="max-width: 200px; max-height: 200px; border-radius: 12px; border: 2px solid var(--border-hover); object-fit: cover;"
-                 alt="Target photo">
-            <p style="margin-top: 12px; color: var(--text-muted); font-size: 13px;">
-              Query visual search engines with your uploaded target image
-            </p>
-          </div>`;
-      }
-
-      html += `<div class="links-grid">`;
-      html += data.reverseImageLinks.map(link => `
-        <div class="link-card">
-          <div style="display: flex; align-items: center; gap: 12px;">
-            <div style="width: 40px; height: 40px; border-radius: 8px; background: rgba(139, 92, 246, 0.15); color: var(--accent-purple); display: flex; align-items: center; justify-content: center; font-size: 18px;">
-              <i class="${link.icon}"></i>
-            </div>
-            <span style="font-weight: 700; font-size: 15px;">${escapeHtml(link.name)}</span>
-          </div>
-          <p style="font-size: 13px; color: var(--text-secondary); flex: 1;">${escapeHtml(link.description)}</p>
-          <a href="${escapeHtml(link.url)}" target="_blank" rel="noopener" class="link-card-action" style="background: rgba(139, 92, 246, 0.12); border: 1px solid rgba(139, 92, 246, 0.3); color: var(--accent-purple);">
-            <i class="fas fa-search"></i> Lens Match
-          </a>
-        </div>
-      `).join('');
-      html += `</div>`;
-
-      container.innerHTML = html;
-    } else {
-      container.innerHTML = `
-        <div class="empty-state" style="padding: 40px; text-align: center; color: var(--text-muted);">
-          <i class="fas fa-camera" style="font-size: 40px; margin-bottom: 12px; display: block;"></i>
-          <h3>No Target Image Uploaded</h3>
-          <p>Upload a target photograph in the scan form to generate automated reverse visual search links.</p>
-        </div>`;
-    }
-  }
-
-  // ═══════════════════════════════════════════════════════════════
-  // TABS & MODAL LOGIC
-  // ═══════════════════════════════════════════════════════════════
 
   document.querySelectorAll('.tab-btn').forEach(btn => {
     btn.addEventListener('click', () => {
@@ -802,28 +747,16 @@
     if (e.target === deleteModal) deleteModal.classList.remove('active');
   });
 
-  // ═══════════════════════════════════════════════════════════════
-  // PRINT PDF & EXPORT REPORTS
-  // ═══════════════════════════════════════════════════════════════
-
-  printReportBtn.addEventListener('click', () => {
-    window.print();
-  });
+  printReportBtn.addEventListener('click', () => window.print());
 
   exportJsonBtn.addEventListener('click', () => {
-    if (!currentResults) {
-      showToast('No scan data available to export.', 'error');
-      return;
-    }
+    if (!currentResults) return showToast('No scan data available to export.', 'error');
     downloadJSON(currentResults, `trace-footprint-report-${Date.now()}.json`);
     showToast('JSON report downloaded successfully.', 'success');
   });
 
   exportCsvBtn.addEventListener('click', () => {
-    if (!currentResults) {
-      showToast('No scan data available to export.', 'error');
-      return;
-    }
+    if (!currentResults) return showToast('No scan data available to export.', 'error');
     downloadCSV(currentResults, `trace-footprint-report-${Date.now()}.csv`);
     showToast('CSV report downloaded successfully.', 'success');
   });
@@ -840,14 +773,6 @@
         csv += `"${acc.platform}","${acc.username}","${acc.url}","${acc.category}","${acc.deleteUrl || ''}"\n`;
       });
     }
-
-    csv += '\nWeb Result Title,URL,Source\n';
-    if (data.webResults) {
-      data.webResults.forEach(res => {
-        csv += `"${(res.title || '').replace(/"/g, '""')}","${res.url}","${res.source || ''}"\n`;
-      });
-    }
-
     const blob = new Blob(['\ufeff' + csv], { type: 'text/csv;charset=utf-8;' });
     downloadBlob(blob, filename);
   }
@@ -866,6 +791,7 @@
   clearBtn.addEventListener('click', () => {
     nameInput.value = '';
     emailInput.value = '';
+    if (phoneInput) phoneInput.value = '';
     usernamesInput.value = '';
     imageInput.value = '';
     selectedFile = null;
