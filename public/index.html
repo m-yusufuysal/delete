@@ -3,11 +3,11 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <meta name="description" content="TRACE — Digital Footprint Intelligence & Erasure Platform. Scan online presence across 60+ platforms, search engines, breach databases, and request data removals.">
-  <title>TRACE — Digital Footprint Intelligence & Erasure System</title>
+  <meta name="description" content="TRACE — All-Seeing OSINT Footprint Radar & Erasure Engine. Interactive Graph Node Analysis, Photo EXIF GPS Inspector, DNS Security Audit, and 100+ Platform Scans.">
+  <title>TRACE — All-Seeing OSINT Intelligence & Erasure Engine</title>
   <link rel="stylesheet" href="styles.css">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
-  <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🔍</text></svg>">
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>👁️</text></svg>">
 </head>
 <body>
   <!-- Background Visual Elements -->
@@ -22,23 +22,23 @@
     <!-- Header -->
     <header class="header" id="header">
       <div class="header-brand">
-        <div class="brand-icon">🔍</div>
+        <div class="brand-icon">👁️</div>
         <div>
-          <div class="brand-title">TRACE</div>
-          <div class="brand-subtitle">Digital Footprint Intelligence & Erasure</div>
+          <div class="brand-title">TRACE <span>OSINT RADAR</span></div>
+          <div class="brand-subtitle">All-Seeing Footprint Intelligence & Erasure</div>
         </div>
       </div>
       <div class="header-status">
         <div class="status-dot"></div>
-        <span class="status-text">System Active — 60+ Platforms & AI Intelligence</span>
+        <span class="status-text">Radar Online — 100+ Platforms & EXIF GPS Engine</span>
       </div>
     </header>
 
     <!-- Scan Form Section -->
     <section class="scan-section" id="scanSection">
       <div class="section-header">
-        <div class="section-icon"><i class="fas fa-crosshairs"></i></div>
-        <h1 class="section-title">Initiate Footprint Scan</h1>
+        <div class="section-icon"><i class="fas fa-radar"></i></div>
+        <h1 class="section-title">Target Reconnaissance Parameters</h1>
       </div>
 
       <div class="scan-form-card">
@@ -46,7 +46,7 @@
           <div class="form-grid">
             <div class="form-group">
               <label class="form-label" for="nameInput">
-                <i class="fas fa-user"></i> Full Name
+                <i class="fas fa-user-secret"></i> Target Full Name
               </label>
               <input type="text" id="nameInput" name="name" class="form-input" 
                      placeholder="e.g. John Doe" autocomplete="off">
@@ -54,7 +54,7 @@
 
             <div class="form-group">
               <label class="form-label" for="emailInput">
-                <i class="fas fa-envelope"></i> Email Address
+                <i class="fas fa-at"></i> Target Email Address
               </label>
               <input type="email" id="emailInput" name="email" class="form-input" 
                      placeholder="e.g. john@example.com" autocomplete="off">
@@ -62,7 +62,7 @@
 
             <div class="form-group">
               <label class="form-label" for="usernamesInput">
-                <i class="fas fa-at"></i> Custom Usernames / Aliases
+                <i class="fas fa-fingerprint"></i> Known Aliases / Handles
               </label>
               <input type="text" id="usernamesInput" name="customUsernames" class="form-input" 
                      placeholder="Comma separated: johndoe42, j.doe" autocomplete="off">
@@ -70,18 +70,18 @@
 
             <div class="form-group">
               <label class="form-label">
-                <i class="fas fa-image"></i> Target Photo (Optional)
+                <i class="fas fa-camera"></i> Target Photograph (EXIF & Visual Lens)
               </label>
               <div class="image-upload-zone" id="imageDropZone">
-                <i class="fas fa-cloud-upload-alt"></i>
-                <p>Drag & drop or click to upload</p>
-                <p class="upload-hint">PNG, JPG, WEBP — Max 15MB</p>
+                <i class="fas fa-eye"></i>
+                <p>Drop photo to extract EXIF Metadata & GPS Coordinates</p>
+                <p class="upload-hint">PNG, JPG, WEBP — Max 25MB</p>
                 <input type="file" id="imageInput" name="image" accept="image/*" style="display: none;">
               </div>
               <div class="image-preview-container" id="imagePreviewContainer">
-                <img class="image-preview" id="imagePreview" alt="Target preview">
+                <img class="image-preview" id="imagePreview" alt="Target image">
                 <div class="image-preview-info">
-                  <div class="image-preview-name" id="imageFileName">image.jpg</div>
+                  <div class="image-preview-name" id="imageFileName">target.jpg</div>
                   <div class="image-preview-size" id="imageFileSize">0 KB</div>
                 </div>
                 <button type="button" class="btn-remove-image" id="removeImageBtn">
@@ -93,21 +93,21 @@
 
           <div class="form-actions">
             <button type="submit" class="btn-scan" id="scanBtn">
-              <i class="fas fa-radar" id="scanBtnIcon"></i>
-              <span id="scanBtnText">Execute Deep Scan</span>
+              <i class="fas fa-crosshairs" id="scanBtnIcon"></i>
+              <span id="scanBtnText">Activate All-Seeing Radar</span>
             </button>
             <button type="button" class="btn-clear" id="clearBtn">
-              <i class="fas fa-eraser"></i> Clear Form
+              <i class="fas fa-eraser"></i> Clear
             </button>
           </div>
         </form>
 
-        <!-- Scan Progress Bar -->
+        <!-- Progress Bar -->
         <div class="scan-progress" id="scanProgress">
           <div class="progress-header">
             <div class="progress-title">
               <div class="progress-spinner"></div>
-              <span>Scanning Intelligence Target...</span>
+              <span>Executing All-Seeing OSINT Radar...</span>
             </div>
             <div class="progress-percentage" id="progressPercent">0%</div>
           </div>
@@ -115,53 +115,56 @@
             <div class="progress-bar" id="progressBar"></div>
           </div>
           <div class="progress-steps">
-            <div class="progress-step" id="step-social" data-step="social">
+            <div class="progress-step" id="step-exif" data-step="exif">
               <i class="fas fa-circle-notch fa-spin"></i>
-              <span>Scanning 60+ social media & developer platforms...</span>
+              <span>Extracting image EXIF camera tags & GPS coordinates...</span>
+            </div>
+            <div class="progress-step" id="step-social" data-step="social">
+              <i class="far fa-circle"></i>
+              <span>Scanning 100+ social, dev, gaming & paste platforms...</span>
             </div>
             <div class="progress-step" id="step-web" data-step="web">
               <i class="far fa-circle"></i>
               <span>Querying global web search & indexed articles...</span>
             </div>
-            <div class="progress-step" id="step-email" data-step="email">
+            <div class="progress-step" id="step-dns" data-step="dns">
               <i class="far fa-circle"></i>
-              <span>Checking Gravatar & email service profiles...</span>
+              <span>Auditing domain DNS, MX records, SPF & DMARC auth...</span>
             </div>
             <div class="progress-step" id="step-breach" data-step="breach">
               <i class="far fa-circle"></i>
-              <span>Checking credential breach databases...</span>
+              <span>Checking darknet leak databases & breach records...</span>
             </div>
             <div class="progress-step" id="step-ai" data-step="ai">
               <i class="far fa-circle"></i>
-              <span>Running AI threat score & legal draft generator...</span>
-            </div>
-            <div class="progress-step" id="step-complete" data-step="complete">
-              <i class="far fa-circle"></i>
-              <span>Finalizing intelligence report...</span>
+              <span>Building AI Risk Profile & Multi-Notice Legal Demands...</span>
             </div>
           </div>
         </div>
       </div>
     </section>
 
-    <!-- Results Section -->
+    <!-- Results Dashboard -->
     <section class="results-section" id="resultsSection">
       <!-- Section Header -->
       <div class="section-header" style="justify-content: space-between;">
         <div style="display: flex; align-items: center; gap: 12px;">
           <div class="section-icon" style="background: var(--gradient-danger);">
-            <i class="fas fa-chart-network"></i>
+            <i class="fas fa-network-wired"></i>
           </div>
-          <h2 class="section-title">Intelligence & Footprint Dashboard</h2>
+          <h2 class="section-title">All-Seeing Footprint Dashboard</h2>
         </div>
         <div style="display: flex; gap: 10px;">
-          <button class="btn-export" id="exportJsonBtn" title="Export as JSON report">
-            <i class="fas fa-file-code"></i> JSON Report
+          <button class="btn-export" id="printReportBtn" title="Print full intelligence report or save as PDF">
+            <i class="fas fa-print"></i> Print PDF Report
           </button>
-          <button class="btn-export" id="exportCsvBtn" title="Export as CSV spreadsheet">
-            <i class="fas fa-file-csv"></i> CSV Report
+          <button class="btn-export" id="exportJsonBtn" title="Export JSON">
+            <i class="fas fa-file-code"></i> JSON
           </button>
-          <button class="btn-export" id="newScanBtn" title="Initiate another scan">
+          <button class="btn-export" id="exportCsvBtn" title="Export CSV">
+            <i class="fas fa-file-csv"></i> CSV
+          </button>
+          <button class="btn-export" id="newScanBtn" title="New Scan">
             <i class="fas fa-plus"></i> New Scan
           </button>
         </div>
@@ -187,19 +190,55 @@
         </div>
       </div>
 
-      <!-- Tab Navigation -->
+      <!-- Interactive Canvas Graph Network -->
+      <div class="graph-card" id="graphContainer">
+        <div class="graph-header">
+          <div style="display: flex; align-items: center; gap: 10px;">
+            <i class="fas fa-project-diagram" style="color: var(--accent-cyan); font-size: 18px;"></i>
+            <h3 style="font-size: 16px; font-weight: 700;">Cyber Footprint Graph Topology</h3>
+          </div>
+          <span style="font-size: 12px; color: var(--text-muted);">Interactive Node Graph • Drag & Inspect</span>
+        </div>
+        <canvas id="cyberGraphCanvas" width="1200" height="360"></canvas>
+      </div>
+
+      <!-- Live Search & Filter Bar -->
+      <div class="filter-bar">
+        <div class="filter-input-wrapper">
+          <i class="fas fa-search"></i>
+          <input type="text" id="accountSearchFilter" placeholder="Filter discovered accounts by keyword or platform..." autocomplete="off">
+        </div>
+        <select id="accountCategoryFilter" class="filter-select">
+          <option value="all">All Categories</option>
+          <option value="developer">Developer & Tech</option>
+          <option value="social">Social Media</option>
+          <option value="professional">Professional</option>
+          <option value="gaming">Gaming</option>
+          <option value="media">Media & Design</option>
+          <option value="blog">Blogging</option>
+          <option value="messaging">Messaging</option>
+        </select>
+      </div>
+
+      <!-- Tabs Navigation -->
       <div class="tabs-nav" id="tabsNav">
         <button class="tab-btn active" data-tab="accounts" id="tabAccounts">
           <i class="fas fa-users"></i> Accounts <span class="badge" id="badgeAccounts">0</span>
         </button>
         <button class="tab-btn" data-tab="ai" id="tabAi">
-          <i class="fas fa-robot"></i> AI Risk & Legal
+          <i class="fas fa-brain"></i> AI Exposure & Legal
+        </button>
+        <button class="tab-btn" data-tab="exif" id="tabExif">
+          <i class="fas fa-camera-retro"></i> Photo EXIF & GPS
+        </button>
+        <button class="tab-btn" data-tab="dns" id="tabDns">
+          <i class="fas fa-shield-halved"></i> DNS Audit
         </button>
         <button class="tab-btn" data-tab="webresults" id="tabWebResults">
           <i class="fas fa-globe"></i> Web Hits <span class="badge" id="badgeWeb">0</span>
         </button>
         <button class="tab-btn" data-tab="breaches" id="tabBreaches">
-          <i class="fas fa-shield-alt"></i> Data Breaches
+          <i class="fas fa-database"></i> Leaks & Breaches
         </button>
         <button class="tab-btn" data-tab="databrokers" id="tabDataBrokers">
           <i class="fas fa-address-card"></i> Data Brokers
@@ -208,10 +247,7 @@
           <i class="fas fa-gavel"></i> Search Removal
         </button>
         <button class="tab-btn" data-tab="imagesearch" id="tabImageSearch">
-          <i class="fas fa-camera"></i> Visual Lens
-        </button>
-        <button class="tab-btn" data-tab="whois" id="tabWhois">
-          <i class="fas fa-server"></i> WHOIS
+          <i class="fas fa-eye"></i> Visual Lens
         </button>
       </div>
 
@@ -222,6 +258,14 @@
 
       <div class="tab-content" id="content-ai">
         <div id="aiAnalysisContent"></div>
+      </div>
+
+      <div class="tab-content" id="content-exif">
+        <div id="exifContent"></div>
+      </div>
+
+      <div class="tab-content" id="content-dns">
+        <div id="dnsContent"></div>
       </div>
 
       <div class="tab-content" id="content-webresults">
@@ -243,14 +287,10 @@
       <div class="tab-content" id="content-imagesearch">
         <div id="imageSearchContent"></div>
       </div>
-
-      <div class="tab-content" id="content-whois">
-        <div id="whoisContent"></div>
-      </div>
     </section>
   </div>
 
-  <!-- Account Deletion Instructions Modal -->
+  <!-- Deletion Instructions Modal -->
   <div class="modal-overlay" id="deleteModal">
     <div class="modal-content">
       <button class="modal-close" id="modalClose"><i class="fas fa-times"></i></button>
@@ -259,7 +299,7 @@
       <div class="modal-instructions" id="modalInstructions"></div>
       <div class="modal-actions">
         <a class="modal-btn modal-btn-primary" id="modalDeleteLink" href="#" target="_blank" rel="noopener">
-          <i class="fas fa-external-link-alt"></i> Open Deletion Page
+          <i class="fas fa-external-link-alt"></i> Open Deletion Portal
         </a>
         <button class="modal-btn modal-btn-secondary" id="modalCloseBtn">
           <i class="fas fa-times"></i> Close
@@ -268,7 +308,7 @@
     </div>
   </div>
 
-  <!-- Toast Notification Container -->
+  <!-- Toast Container -->
   <div class="toast-container" id="toastContainer"></div>
 
   <script src="app.js"></script>

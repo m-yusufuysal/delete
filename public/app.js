@@ -1,6 +1,7 @@
 /* ═══════════════════════════════════════════════════════════════
-   TRACE — DIGITAL FOOTPRINT INTELLIGENCE & ERASURE SYSTEM
-   Frontend Application Logic (English Localization)
+   TRACE — ALL-SEEING OSINT INTELLIGENCE ENGINE (APP LOGIC)
+   Interactive Canvas Topology, EXIF GPS Inspector, DNS Audit,
+   Live Search Filtering, Removal Tracker & PDF Printing
    ═══════════════════════════════════════════════════════════════ */
 
 (function () {
@@ -36,11 +37,15 @@
   const toastContainer = document.getElementById('toastContainer');
   const exportJsonBtn = document.getElementById('exportJsonBtn');
   const exportCsvBtn = document.getElementById('exportCsvBtn');
+  const printReportBtn = document.getElementById('printReportBtn');
   const newScanBtn = document.getElementById('newScanBtn');
+  const accountSearchFilter = document.getElementById('accountSearchFilter');
+  const accountCategoryFilter = document.getElementById('accountCategoryFilter');
 
   // ── State ──
   let currentResults = null;
   let selectedFile = null;
+  let removedAccountIds = new Set(JSON.parse(localStorage.getItem('trace_removed_accounts') || '[]'));
 
   // ═══════════════════════════════════════════════════════════════
   // FILE UPLOAD MANAGEMENT
@@ -80,8 +85,8 @@
   });
 
   function handleImageSelect(file) {
-    if (file.size > 15 * 1024 * 1024) {
-      showToast('Image file size must be under 15MB.', 'error');
+    if (file.size > 25 * 1024 * 1024) {
+      showToast('Image file size must be under 25MB.', 'error');
       return;
     }
 
@@ -115,7 +120,7 @@
     const customUsernames = usernamesInput.value.trim();
 
     if (!name && !email) {
-      showToast('Please provide at least a full name or email address.', 'error');
+      showToast('Please provide at least a target name or email address.', 'error');
       return;
     }
 
@@ -147,7 +152,7 @@
       await completeProgress();
       renderResults(data);
 
-      showToast(`Scan complete! ${data.socialAccounts.length} accounts & ${data.webResults.length} web hits discovered.`, 'success');
+      showToast(`Scan complete! Discovered ${data.socialAccounts.length} profiles & ${data.webResults.length} web hits.`, 'success');
 
     } catch (err) {
       console.error('Scan execution error:', err);
@@ -159,7 +164,7 @@
   function startScanUI() {
     scanBtn.disabled = true;
     scanBtn.classList.add('scanning');
-    scanBtnText.textContent = 'Scanning Intelligence...';
+    scanBtnText.textContent = 'Scanning Radar...';
     scanBtnIcon.className = 'fas fa-spinner fa-spin';
     scanProgress.classList.add('active');
     resultsSection.classList.remove('active');
@@ -169,34 +174,38 @@
       step.querySelector('i').className = 'far fa-circle';
     });
 
-    const firstStep = document.getElementById('step-social');
+    const firstStep = document.getElementById('step-exif');
     firstStep.classList.add('active');
     firstStep.querySelector('i').className = 'fas fa-circle-notch fa-spin';
   }
 
   function simulateProgress() {
     let progress = 0;
-    const steps = ['social', 'web', 'email', 'breach', 'ai'];
+    const steps = ['exif', 'social', 'web', 'dns', 'breach', 'ai'];
     let currentStepIdx = 0;
 
     return setInterval(() => {
-      progress += Math.random() * 7 + 3;
-      if (progress > 88) progress = 88;
+      progress += Math.random() * 6 + 2;
+      if (progress > 90) progress = 90;
 
       progressBar.style.width = progress + '%';
       progressPercent.textContent = Math.round(progress) + '%';
 
-      const newStepIdx = Math.min(Math.floor(progress / 18), steps.length - 1);
+      const newStepIdx = Math.min(Math.floor(progress / 15), steps.length - 1);
       if (newStepIdx > currentStepIdx) {
         for (let i = currentStepIdx; i < newStepIdx; i++) {
           const stepEl = document.getElementById(`step-${steps[i]}`);
-          stepEl.classList.remove('active');
-          stepEl.classList.add('done');
-          stepEl.querySelector('i').className = 'fas fa-check-circle';
+          if (stepEl) {
+            stepEl.classList.remove('active');
+            stepEl.classList.add('done');
+            stepEl.querySelector('i').className = 'fas fa-check-circle';
+          }
         }
         const nextStep = document.getElementById(`step-${steps[newStepIdx]}`);
-        nextStep.classList.add('active');
-        nextStep.querySelector('i').className = 'fas fa-circle-notch fa-spin';
+        if (nextStep) {
+          nextStep.classList.add('active');
+          nextStep.querySelector('i').className = 'fas fa-circle-notch fa-spin';
+        }
         currentStepIdx = newStepIdx;
       }
     }, 300);
@@ -217,15 +226,15 @@
         scanProgress.classList.remove('active');
         endScanUI();
         resolve();
-      }, 700);
+      }, 600);
     });
   }
 
   function endScanUI() {
     scanBtn.disabled = false;
     scanBtn.classList.remove('scanning');
-    scanBtnText.textContent = 'Execute Deep Scan';
-    scanBtnIcon.className = 'fas fa-radar';
+    scanBtnText.textContent = 'Activate All-Seeing Radar';
+    scanBtnIcon.className = 'fas fa-crosshairs';
   }
 
   // ═══════════════════════════════════════════════════════════════
@@ -255,14 +264,18 @@
     document.getElementById('badgeAccounts').textContent = accountsCount;
     document.getElementById('badgeWeb').textContent = webCount;
 
+    // Draw Topology Canvas Graph
+    drawTopologyGraph(data);
+
     renderAccounts(data.socialAccounts);
     renderAIAnalysis(data.aiAnalysis);
+    renderEXIF(data.exifInfo);
+    renderDNS(data.dnsAudit);
     renderWebResults(data.webResults);
     renderBreachLinks(data.breachLinks);
     renderDataBrokers(data.dataBrokerLinks);
     renderRemovalLinks(data.removalLinks);
     renderImageSearch(data);
-    renderWhois(data.whoisData);
   }
 
   function animateNumber(elementId, target) {
@@ -282,48 +295,182 @@
     requestAnimationFrame(update);
   }
 
-  // ── Render Accounts Grid ──
+  // ═══════════════════════════════════════════════════════════════
+  // INTERACTIVE CANVAS NODE GRAPH TOPOLOGY
+  // ═══════════════════════════════════════════════════════════════
+
+  function drawTopologyGraph(data) {
+    const canvas = document.getElementById('cyberGraphCanvas');
+    if (!canvas) return;
+    const ctx = canvas.getContext('2d');
+    const width = canvas.width = canvas.parentElement.clientWidth || 1200;
+    const height = canvas.height = 340;
+
+    const nodes = [];
+    const links = [];
+
+    // Target Node
+    const centerNode = { id: 'target', label: data.input.name || data.input.email || 'Target', x: width / 2, y: height / 2, radius: 26, color: '#3b82f6', isCenter: true };
+    nodes.push(centerNode);
+
+    // Platform Nodes
+    data.socialAccounts.slice(0, 14).forEach((acc, i) => {
+      const angle = (i / Math.min(14, data.socialAccounts.length)) * Math.PI * 2;
+      const dist = 130 + Math.random() * 30;
+      const node = {
+        id: `acc_${i}`,
+        label: acc.platform,
+        x: width / 2 + Math.cos(angle) * dist,
+        y: height / 2 + Math.sin(angle) * dist,
+        radius: 14,
+        color: '#10b981'
+      };
+      nodes.push(node);
+      links.push({ from: centerNode, to: node });
+    });
+
+    // Web / Leak Nodes
+    if (data.webResults.length > 0) {
+      const webNode = { id: 'web_cluster', label: `${data.webResults.length} Web Hits`, x: width / 2 - 240, y: height / 2 - 80, radius: 18, color: '#06b6d4' };
+      nodes.push(webNode);
+      links.push({ from: centerNode, to: webNode });
+    }
+
+    if (data.exifInfo && data.exifInfo.gps) {
+      const gpsNode = { id: 'gps_node', label: 'GPS Geotag', x: width / 2 + 240, y: height / 2 - 80, radius: 18, color: '#ef4444' };
+      nodes.push(gpsNode);
+      links.push({ from: centerNode, to: gpsNode });
+    }
+
+    let animFrame;
+    let tick = 0;
+
+    function renderGraph() {
+      ctx.clearRect(0, 0, width, height);
+      tick += 0.02;
+
+      // Draw Links
+      links.forEach(link => {
+        ctx.beginPath();
+        ctx.moveTo(link.from.x, link.from.y);
+        ctx.lineTo(link.to.x, link.to.y);
+        ctx.strokeStyle = 'rgba(59, 130, 246, 0.25)';
+        ctx.lineWidth = 1.5;
+        ctx.stroke();
+
+        // Pulsing signals
+        const pulseRatio = (Math.sin(tick + link.to.x) + 1) / 2;
+        const pulseX = link.from.x + (link.to.x - link.from.x) * pulseRatio;
+        const pulseY = link.from.y + (link.to.y - link.from.y) * pulseRatio;
+        
+        ctx.beginPath();
+        ctx.arc(pulseX, pulseY, 3, 0, Math.PI * 2);
+        ctx.fillStyle = '#60a5fa';
+        ctx.fill();
+      });
+
+      // Draw Nodes
+      nodes.forEach(node => {
+        ctx.beginPath();
+        ctx.arc(node.x, node.y, node.radius, 0, Math.PI * 2);
+        ctx.fillStyle = node.color;
+        ctx.shadowColor = node.color;
+        ctx.shadowBlur = 15;
+        ctx.fill();
+        ctx.shadowBlur = 0;
+
+        ctx.fillStyle = '#f8fafc';
+        ctx.font = node.isCenter ? 'bold 13px Inter' : '11px Inter';
+        ctx.textAlign = 'center';
+        ctx.fillText(node.label, node.x, node.y + node.radius + 14);
+      });
+
+      animFrame = requestAnimationFrame(renderGraph);
+    }
+
+    renderGraph();
+  }
+
+  // ── Render Accounts Grid & Filter Handler ──
   function renderAccounts(accounts) {
     const grid = document.getElementById('accountsGrid');
+    const searchVal = accountSearchFilter.value.toLowerCase().trim();
+    const catVal = accountCategoryFilter.value;
 
-    if (!accounts || accounts.length === 0) {
+    let filtered = accounts || [];
+
+    if (searchVal) {
+      filtered = filtered.filter(a => a.platform.toLowerCase().includes(searchVal) || a.username.toLowerCase().includes(searchVal));
+    }
+
+    if (catVal !== 'all') {
+      filtered = filtered.filter(a => (a.category || '').toLowerCase() === catVal);
+    }
+
+    if (filtered.length === 0) {
       grid.innerHTML = `
         <div class="empty-state" style="grid-column: 1/-1; padding: 40px; text-align: center; color: var(--text-muted);">
           <i class="fas fa-user-slash" style="font-size: 40px; margin-bottom: 12px; display: block;"></i>
-          <h3>No Public Accounts Detected</h3>
-          <p>No active public profiles matching the queried aliases were discovered.</p>
+          <h3>No Profiles Matching Filter</h3>
+          <p>Try clearing your search query or choosing another category.</p>
         </div>`;
       return;
     }
 
-    grid.innerHTML = accounts.map(account => `
-      <div class="account-card">
-        <div class="account-icon">
-          <i class="${account.icon || 'fas fa-globe'}"></i>
-        </div>
-        <div class="account-info">
-          <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 4px;">
-            <span class="account-platform">${escapeHtml(account.platform)}</span>
-            <span class="category-tag category-${account.category || 'other'}">${account.category || 'other'}</span>
+    grid.innerHTML = filtered.map(account => {
+      const accId = `${account.platform}_${account.username}`;
+      const isRemoved = removedAccountIds.has(accId);
+
+      return `
+        <div class="account-card" id="card_${accId}" style="${isRemoved ? 'opacity: 0.55; border-color: var(--accent-green);' : ''}">
+          <div class="account-icon">
+            <i class="${account.icon || 'fas fa-globe'}"></i>
           </div>
-          <div class="account-username">@${escapeHtml(account.username)}</div>
-          <a href="${escapeHtml(account.url)}" target="_blank" rel="noopener" class="account-url">
-            ${escapeHtml(account.url)}
-          </a>
-          <div class="account-actions">
-            <a href="${escapeHtml(account.url)}" target="_blank" rel="noopener" class="btn-action btn-visit">
-              <i class="fas fa-external-link-alt"></i> Visit Profile
-            </a>
-            ${account.deleteUrl ? `
-              <button class="btn-action btn-delete" onclick="showDeleteModal('${escapeHtml(account.platform)}', '${escapeHtml(account.deleteUrl)}', '${escapeHtml(account.deleteInstructions || '')}')">
-                <i class="fas fa-trash"></i> Delete Guide
+          <div class="account-info">
+            <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 4px;">
+              <span class="account-platform">${escapeHtml(account.platform)}</span>
+              <span class="category-tag category-${account.category || 'other'}">${account.category || 'other'}</span>
+            </div>
+            <div class="account-username">@${escapeHtml(account.username)}</div>
+            <a href="${escapeHtml(account.url)}" target="_blank" rel="noopener" class="account-url">${escapeHtml(account.url)}</a>
+            <div class="account-actions">
+              <a href="${escapeHtml(account.url)}" target="_blank" rel="noopener" class="btn-action btn-visit">
+                <i class="fas fa-external-link-alt"></i> Visit
+              </a>
+              ${account.deleteUrl ? `
+                <button class="btn-action btn-delete" onclick="showDeleteModal('${escapeHtml(account.platform)}', '${escapeHtml(account.deleteUrl)}', '${escapeHtml(account.deleteInstructions || '')}')">
+                  <i class="fas fa-trash"></i> Delete Guide
+                </button>
+              ` : ''}
+              <button class="btn-action btn-track-removed ${isRemoved ? 'is-removed' : ''}" onclick="toggleTrackRemoved('${accId}')">
+                <i class="fas ${isRemoved ? 'fa-check-circle' : 'fa-circle-notch'}"></i> ${isRemoved ? 'Erased' : 'Mark Erased'}
               </button>
-            ` : ''}
+            </div>
           </div>
         </div>
-      </div>
-    `).join('');
+      `;
+    }).join('');
   }
+
+  accountSearchFilter.addEventListener('input', () => {
+    if (currentResults) renderAccounts(currentResults.socialAccounts);
+  });
+
+  accountCategoryFilter.addEventListener('change', () => {
+    if (currentResults) renderAccounts(currentResults.socialAccounts);
+  });
+
+  window.toggleTrackRemoved = function (accId) {
+    if (removedAccountIds.has(accId)) {
+      removedAccountIds.delete(accId);
+      showToast('Marked account as pending.', 'info');
+    } else {
+      removedAccountIds.add(accId);
+      showToast('Account marked as Erased!', 'success');
+    }
+    localStorage.setItem('trace_removed_accounts', JSON.stringify([...removedAccountIds]));
+    if (currentResults) renderAccounts(currentResults.socialAccounts);
+  };
 
   // ── Render AI Analysis ──
   function renderAIAnalysis(ai) {
@@ -339,9 +486,9 @@
         <div class="ai-header">
           <div>
             <h3 style="font-size: 20px; font-weight: 700; margin-bottom: 4px;">
-              <i class="fas fa-brain" style="color: var(--accent-purple);"></i> AI Footprint Risk Profile
+              <i class="fas fa-brain" style="color: var(--accent-purple);"></i> AI Footprint Assessment
             </h3>
-            <p style="font-size: 14px; color: var(--text-secondary);">Automated threat calculation and privacy recommendations</p>
+            <p style="font-size: 14px; color: var(--text-secondary);">Automated threat calculation and privacy vulnerability audit</p>
           </div>
           <div class="ai-grade-badge" style="background: ${ai.threatColor}20; color: ${ai.threatColor}; border: 1px solid ${ai.threatColor}50;">
             ${escapeHtml(ai.threatGrade)}
@@ -350,12 +497,12 @@
 
         <div style="margin-bottom: 24px;">
           <h4 style="font-size: 14px; font-weight: 600; text-transform: uppercase; letter-spacing: 1px; color: var(--text-muted); margin-bottom: 12px;">
-            <i class="fas fa-list-check" style="color: var(--accent-blue);"></i> Security Recommendations
+            <i class="fas fa-shield-halved" style="color: var(--accent-blue);"></i> Security Recommendations
           </h4>
           <ul style="display: flex; flex-direction: column; gap: 8px; list-style: none;">
             ${ai.recommendations.map(rec => `
               <li style="font-size: 14px; color: var(--text-primary); display: flex; align-items: flex-start; gap: 10px; background: rgba(59,130,246,0.05); padding: 10px 14px; border-radius: 8px; border: 1px solid var(--border-primary);">
-                <i class="fas fa-shield-halved" style="color: var(--accent-cyan); margin-top: 3px;"></i>
+                <i class="fas fa-shield" style="color: var(--accent-cyan); margin-top: 3px;"></i>
                 <span>${escapeHtml(rec)}</span>
               </li>
             `).join('')}
@@ -363,25 +510,116 @@
         </div>
 
         <div>
-          <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 8px;">
-            <h4 style="font-size: 14px; font-weight: 600; text-transform: uppercase; letter-spacing: 1px; color: var(--text-muted);">
-              <i class="fas fa-gavel" style="color: var(--accent-green);"></i> AI-Generated GDPR Article 17 Erasure Notice
-            </h4>
+          <div style="display: flex; gap: 10px; margin-bottom: 12px;">
+            <button class="btn-export active" id="noticeGdprBtn"><i class="fas fa-gavel"></i> GDPR Notice</button>
+            <button class="btn-export" id="noticeCcpaBtn"><i class="fas fa-balance-scale"></i> CCPA Notice</button>
+            <button class="btn-export" id="noticeDmcaBtn"><i class="fas fa-copyright"></i> DMCA Notice</button>
           </div>
           <div class="ai-legal-box" id="legalNoticeBox">
             <button class="btn-copy-legal" id="copyLegalBtn">
               <i class="fas fa-copy"></i> Copy Notice
             </button>
-            ${escapeHtml(ai.legalDraftGDPR)}
+            <pre id="legalNoticeText" style="white-space: pre-wrap; font-family: inherit;">${escapeHtml(ai.legalNotices.gdpr)}</pre>
           </div>
         </div>
       </div>
     `;
 
-    document.getElementById('copyLegalBtn').addEventListener('click', () => {
-      navigator.clipboard.writeText(ai.legalDraftGDPR);
-      showToast('GDPR Legal Request copied to clipboard!', 'success');
+    const noticeText = document.getElementById('legalNoticeText');
+    document.getElementById('noticeGdprBtn').addEventListener('click', (e) => {
+      noticeText.textContent = ai.legalNotices.gdpr;
+      showToast('Switched to GDPR Article 17 Notice.', 'info');
     });
+    document.getElementById('noticeCcpaBtn').addEventListener('click', (e) => {
+      noticeText.textContent = ai.legalNotices.ccpa;
+      showToast('Switched to CCPA Opt-Out Notice.', 'info');
+    });
+    document.getElementById('noticeDmcaBtn').addEventListener('click', (e) => {
+      noticeText.textContent = ai.legalNotices.dmca;
+      showToast('Switched to DMCA Takedown Notice.', 'info');
+    });
+
+    document.getElementById('copyLegalBtn').addEventListener('click', () => {
+      navigator.clipboard.writeText(noticeText.textContent);
+      showToast('Legal Notice copied to clipboard!', 'success');
+    });
+  }
+
+  // ── Render Photo EXIF & GPS ──
+  function renderEXIF(exif) {
+    const container = document.getElementById('exifContent');
+
+    if (!exif || !exif.hasExif) {
+      container.innerHTML = `
+        <div class="empty-state" style="padding: 40px; text-align: center; color: var(--text-muted);">
+          <i class="fas fa-camera-retro" style="font-size: 40px; margin-bottom: 12px; display: block;"></i>
+          <h3>No Photo EXIF Metadata Found</h3>
+          <p>Either no photo was uploaded or the uploaded photo has stripped metadata.</p>
+        </div>`;
+      return;
+    }
+
+    let html = `
+      <div style="background: var(--bg-card); border: 1px solid var(--border-primary); border-radius: 16px; padding: 24px;">
+        <h3 style="font-size: 18px; font-weight: 700; margin-bottom: 16px; color: var(--accent-cyan);">
+          <i class="fas fa-camera"></i> Camera EXIF Tag Extraction
+        </h3>
+        <table style="width: 100%; border-collapse: collapse; margin-bottom: 20px;">
+          <tbody>
+            ${exif.cameraMake ? `<tr><th style="padding: 8px; text-align: left; color: var(--text-muted);">Camera Make</th><td style="padding: 8px;">${escapeHtml(exif.cameraMake)}</td></tr>` : ''}
+            ${exif.cameraModel ? `<tr><th style="padding: 8px; text-align: left; color: var(--text-muted);">Camera Model</th><td style="padding: 8px;">${escapeHtml(exif.cameraModel)}</td></tr>` : ''}
+            ${exif.createDate ? `<tr><th style="padding: 8px; text-align: left; color: var(--text-muted);">Original Date</th><td style="padding: 8px;">${escapeHtml(exif.createDate)}</td></tr>` : ''}
+            ${exif.software ? `<tr><th style="padding: 8px; text-align: left; color: var(--text-muted);">Software</th><td style="padding: 8px;">${escapeHtml(exif.software)}</td></tr>` : ''}
+            ${exif.imageWidth ? `<tr><th style="padding: 8px; text-align: left; color: var(--text-muted);">Resolution</th><td style="padding: 8px;">${exif.imageWidth} x ${exif.imageHeight} px</td></tr>` : ''}
+          </tbody>
+        </table>`;
+
+    if (exif.gps) {
+      html += `
+        <div style="background: rgba(239, 68, 68, 0.1); border: 1px solid rgba(239, 68, 68, 0.3); border-radius: 12px; padding: 20px;">
+          <h4 style="color: var(--accent-red); font-size: 16px; font-weight: 700; margin-bottom: 8px;">
+            <i class="fas fa-location-dot"></i> Embedded GPS Location Metadata Found!
+          </h4>
+          <p style="font-size: 14px; margin-bottom: 12px;">Latitude: ${exif.gps.latitude}, Longitude: ${exif.gps.longitude}</p>
+          <a href="${escapeHtml(exif.gps.mapsUrl)}" target="_blank" rel="noopener" class="link-card-action breach-link">
+            <i class="fas fa-map-location-dot"></i> Open Location in Google Maps
+          </a>
+        </div>`;
+    }
+
+    html += `</div>`;
+    container.innerHTML = html;
+  }
+
+  // ── Render DNS Audit ──
+  function renderDNS(dns) {
+    const container = document.getElementById('dnsContent');
+
+    if (!dns || dns.error) {
+      container.innerHTML = `
+        <div class="empty-state" style="padding: 40px; text-align: center; color: var(--text-muted);">
+          <i class="fas fa-shield-halved" style="font-size: 40px; margin-bottom: 12px; display: block;"></i>
+          <h3>No Custom Email Domain Audit</h3>
+          <p>DNS security audit is run on custom email domains (e.g. company.com).</p>
+        </div>`;
+      return;
+    }
+
+    container.innerHTML = `
+      <div style="background: var(--bg-card); border: 1px solid var(--border-primary); border-radius: 16px; padding: 24px;">
+        <h3 style="font-size: 18px; font-weight: 700; margin-bottom: 16px; color: var(--accent-blue);">
+          <i class="fas fa-server"></i> Domain DNS & Email Authentication Audit
+        </h3>
+        <p style="font-size: 14px; color: var(--text-secondary); margin-bottom: 16px;">Target Domain: <strong>${escapeHtml(dns.domain)}</strong></p>
+        <div style="margin-bottom: 16px;">
+          <strong>Security Rating:</strong> <span style="color: ${dns.hasSpf && dns.hasDmarc ? 'var(--accent-green)' : 'var(--accent-orange)'}">${escapeHtml(dns.securityRating)}</span>
+        </div>
+        <div style="background: var(--bg-tertiary); padding: 16px; border-radius: 12px; font-family: 'JetBrains Mono', monospace; font-size: 13px;">
+          <div><strong>MX Servers:</strong> ${escapeHtml((dns.mxRecords || []).join(', ') || 'None')}</div>
+          <div style="margin-top: 8px;"><strong>SPF Record:</strong> ${escapeHtml(dns.spfRecord || 'Missing')}</div>
+          <div style="margin-top: 8px;"><strong>DMARC Record:</strong> ${escapeHtml(dns.dmarcRecord || 'Missing')}</div>
+        </div>
+      </div>`;
   }
 
   // ── Render Web Search Results ──
@@ -423,7 +661,7 @@
     if (!links || links.length === 0) {
       grid.innerHTML = `
         <div class="empty-state" style="grid-column: 1/-1; padding: 40px; text-align: center; color: var(--text-muted);">
-          <i class="fas fa-shield-alt" style="font-size: 40px; margin-bottom: 12px; display: block;"></i>
+          <i class="fas fa-database" style="font-size: 40px; margin-bottom: 12px; display: block;"></i>
           <h3>Email Address Required</h3>
           <p>Please enter an email address to query global breach databases.</p>
         </div>`;
@@ -449,11 +687,7 @@
   // ── Render Data Brokers ──
   function renderDataBrokers(links) {
     const grid = document.getElementById('dataBrokersGrid');
-
-    if (!links || links.length === 0) {
-      grid.innerHTML = `<div class="empty-state">No data broker links generated.</div>`;
-      return;
-    }
+    if (!links) return;
 
     grid.innerHTML = links.map(link => `
       <div class="link-card">
@@ -464,7 +698,7 @@
           <span style="font-weight: 700; font-size: 15px;">${escapeHtml(link.name)}</span>
         </div>
         <p style="font-size: 13px; color: var(--text-secondary); flex: 1;">${escapeHtml(link.description)}</p>
-        <a href="${escapeHtml(link.url)}" target="_blank" rel="noopener" class="link-card-action broker-link">
+        <a href="${escapeHtml(link.url)}" target="_blank" rel="noopener" class="link-card-action" style="background: rgba(245, 158, 11, 0.12); border: 1px solid rgba(245, 158, 11, 0.3); color: var(--accent-orange);">
           <i class="fas fa-user-slash"></i> Opt-Out Page
         </a>
       </div>
@@ -474,11 +708,7 @@
   // ── Render Search Removal ──
   function renderRemovalLinks(links) {
     const grid = document.getElementById('removalGrid');
-
-    if (!links || links.length === 0) {
-      grid.innerHTML = `<div class="empty-state">No removal links generated.</div>`;
-      return;
-    }
+    if (!links) return;
 
     grid.innerHTML = links.map(link => `
       <div class="link-card">
@@ -489,8 +719,8 @@
           <span style="font-weight: 700; font-size: 15px;">${escapeHtml(link.name)}</span>
         </div>
         <p style="font-size: 13px; color: var(--text-secondary); flex: 1;">${escapeHtml(link.description)}</p>
-        <a href="${escapeHtml(link.url)}" target="_blank" rel="noopener" class="link-card-action removal-link">
-          <i class="fas fa-external-link-alt"></i> Official Removal Form
+        <a href="${escapeHtml(link.url)}" target="_blank" rel="noopener" class="link-card-action" style="background: rgba(16, 185, 129, 0.12); border: 1px solid rgba(16, 185, 129, 0.3); color: var(--accent-green);">
+          <i class="fas fa-external-link-alt"></i> Removal Form
         </a>
       </div>
     `).join('');
@@ -525,7 +755,7 @@
           </div>
           <p style="font-size: 13px; color: var(--text-secondary); flex: 1;">${escapeHtml(link.description)}</p>
           <a href="${escapeHtml(link.url)}" target="_blank" rel="noopener" class="link-card-action" style="background: rgba(139, 92, 246, 0.12); border: 1px solid rgba(139, 92, 246, 0.3); color: var(--accent-purple);">
-            <i class="fas fa-search"></i> Execute Lens Match
+            <i class="fas fa-search"></i> Lens Match
           </a>
         </div>
       `).join('');
@@ -542,46 +772,6 @@
     }
   }
 
-  // ── Render WHOIS ──
-  function renderWhois(whoisData) {
-    const container = document.getElementById('whoisContent');
-
-    if (!whoisData || !whoisData.found) {
-      container.innerHTML = `
-        <div class="empty-state" style="padding: 40px; text-align: center; color: var(--text-muted);">
-          <i class="fas fa-server" style="font-size: 40px; margin-bottom: 12px; display: block;"></i>
-          <h3>No Custom Domain WHOIS Available</h3>
-          <p>WHOIS information is displayed when scanning custom domain email addresses (e.g., target@company.com).</p>
-        </div>`;
-      return;
-    }
-
-    const data = whoisData.data;
-    const fields = [
-      ['Domain Name', data.domainName],
-      ['Registrar', data.registrar],
-      ['Creation Date', data.creationDate],
-      ['Updated Date', data.updatedDate],
-      ['Expiration Date', data.registrarRegistrationExpirationDate || data.expiryDate],
-      ['Name Servers', Array.isArray(data.nameServer) ? data.nameServer.join(', ') : data.nameServer],
-      ['Registrant Country', data.registrantCountry],
-    ].filter(([, val]) => val);
-
-    container.innerHTML = `
-      <div style="background: var(--bg-card); border: 1px solid var(--border-primary); border-radius: 16px; padding: 24px;">
-        <table style="width: 100%; border-collapse: collapse;">
-          <tbody>
-            ${fields.map(([key, val]) => `
-              <tr>
-                <th style="padding: 10px 16px; text-align: left; border-bottom: 1px solid var(--border-primary); font-size: 11px; text-transform: uppercase; color: var(--text-muted); width: 180px;">${escapeHtml(key)}</th>
-                <td style="padding: 10px 16px; border-bottom: 1px solid var(--border-primary); font-family: 'JetBrains Mono', monospace; font-size: 13px;">${escapeHtml(String(val))}</td>
-              </tr>
-            `).join('')}
-          </tbody>
-        </table>
-      </div>`;
-  }
-
   // ═══════════════════════════════════════════════════════════════
   // TABS & MODAL LOGIC
   // ═══════════════════════════════════════════════════════════════
@@ -593,7 +783,8 @@
       btn.classList.add('active');
 
       document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
-      document.getElementById(`content-${tab}`).classList.add('active');
+      const targetContent = document.getElementById(`content-${tab}`);
+      if (targetContent) targetContent.classList.add('active');
     });
   });
 
@@ -612,8 +803,12 @@
   });
 
   // ═══════════════════════════════════════════════════════════════
-  // EXPORT REPORTS
+  // PRINT PDF & EXPORT REPORTS
   // ═══════════════════════════════════════════════════════════════
+
+  printReportBtn.addEventListener('click', () => {
+    window.print();
+  });
 
   exportJsonBtn.addEventListener('click', () => {
     if (!currentResults) {
@@ -690,14 +885,8 @@
     const toast = document.createElement('div');
     toast.className = `toast toast-${type}`;
 
-    const icons = {
-      success: 'fas fa-check-circle',
-      error: 'fas fa-exclamation-circle',
-      info: 'fas fa-info-circle'
-    };
-
     toast.innerHTML = `
-      <i class="toast-icon ${icons[type] || icons.info}" style="color: ${type === 'success' ? 'var(--accent-green)' : type === 'error' ? 'var(--accent-red)' : 'var(--accent-blue)'}"></i>
+      <i class="toast-icon fas fa-${type === 'success' ? 'check-circle' : type === 'error' ? 'exclamation-circle' : 'info-circle'}" style="color: ${type === 'success' ? 'var(--accent-green)' : type === 'error' ? 'var(--accent-red)' : 'var(--accent-blue)'}"></i>
       <span style="font-size: 14px; flex: 1;">${escapeHtml(message)}</span>
       <button style="background: none; border: none; color: var(--text-muted); cursor: pointer;" onclick="this.parentElement.remove()">
         <i class="fas fa-times"></i>
