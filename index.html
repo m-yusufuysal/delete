@@ -1,0 +1,318 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="TRACE — All-Seeing OSINT Footprint, Phone & Relatives Reconnaissance Engine. Reverse phone lookup, family tree connections, EXIF GPS location inspector, and 100+ platform checkers.">
+  <title>TRACE — All-Seeing OSINT & Relatives Reconnaissance Engine</title>
+  <link rel="stylesheet" href="styles.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>👁️</text></svg>">
+</head>
+<body>
+  <div class="bg-grid"></div>
+  <div class="floating-orbs">
+    <div class="orb orb-1"></div>
+    <div class="orb orb-2"></div>
+    <div class="orb orb-3"></div>
+  </div>
+
+  <div class="app-container">
+    <header class="header" id="header">
+      <div class="header-brand">
+        <div class="brand-icon">👁️</div>
+        <div>
+          <div class="brand-title">TRACE <span>RADAR & RELATIVES</span></div>
+          <div class="brand-subtitle">All-Seeing Deep Reconnaissance Engine</div>
+        </div>
+      </div>
+      <div class="header-status">
+        <div class="status-dot"></div>
+        <span class="status-text">Radar Online — Phone & Family Kinship Engine Active</span>
+      </div>
+    </header>
+
+    <section class="scan-section" id="scanSection">
+      <div class="section-header">
+        <div class="section-icon"><i class="fas fa-radar"></i></div>
+        <h1 class="section-title">Target Reconnaissance Parameters</h1>
+      </div>
+
+      <div class="scan-form-card">
+        <form id="scanForm" enctype="multipart/form-data">
+          <div class="form-grid">
+            <div class="form-group">
+              <label class="form-label" for="nameInput">
+                <i class="fas fa-user-secret"></i> Target Full Name
+              </label>
+              <input type="text" id="nameInput" name="name" class="form-input" 
+                     placeholder="e.g. John Doe" autocomplete="off">
+            </div>
+
+            <div class="form-group">
+              <label class="form-label" for="emailInput">
+                <i class="fas fa-at"></i> Target Email Address
+              </label>
+              <input type="email" id="emailInput" name="email" class="form-input" 
+                     placeholder="e.g. john@example.com" autocomplete="off">
+            </div>
+
+            <div class="form-group">
+              <label class="form-label" for="phoneInput">
+                <i class="fas fa-phone"></i> Target Phone Number
+              </label>
+              <input type="tel" id="phoneInput" name="phone" class="form-input" 
+                     placeholder="e.g. +1 555-0199 or +90 5xx xxx xx xx" autocomplete="off">
+            </div>
+
+            <div class="form-group">
+              <label class="form-label" for="usernamesInput">
+                <i class="fas fa-fingerprint"></i> Known Aliases / Handles
+              </label>
+              <input type="text" id="usernamesInput" name="customUsernames" class="form-input" 
+                     placeholder="Comma separated: johndoe42, j.doe" autocomplete="off">
+            </div>
+
+            <div class="form-group full-width">
+              <label class="form-label">
+                <i class="fas fa-camera"></i> Target Photograph (EXIF GPS & Visual Lens)
+              </label>
+              <div class="image-upload-zone" id="imageDropZone">
+                <i class="fas fa-eye"></i>
+                <p>Drop target photo to extract EXIF Camera Metadata & Embedded GPS Coordinates</p>
+                <p class="upload-hint">PNG, JPG, WEBP — Max 25MB</p>
+                <input type="file" id="imageInput" name="image" accept="image/*" style="display: none;">
+              </div>
+              <div class="image-preview-container" id="imagePreviewContainer">
+                <img class="image-preview" id="imagePreview" alt="Target image">
+                <div class="image-preview-info">
+                  <div class="image-preview-name" id="imageFileName">target.jpg</div>
+                  <div class="image-preview-size" id="imageFileSize">0 KB</div>
+                </div>
+                <button type="button" class="btn-remove-image" id="removeImageBtn">
+                  <i class="fas fa-times"></i> Remove
+                </button>
+              </div>
+            </div>
+          </div>
+
+          <div class="form-actions">
+            <button type="submit" class="btn-scan" id="scanBtn">
+              <i class="fas fa-crosshairs" id="scanBtnIcon"></i>
+              <span id="scanBtnText">Activate All-Seeing Deep Radar</span>
+            </button>
+            <button type="button" class="btn-clear" id="clearBtn">
+              <i class="fas fa-eraser"></i> Clear
+            </button>
+          </div>
+        </form>
+
+        <div class="scan-progress" id="scanProgress">
+          <div class="progress-header">
+            <div class="progress-title">
+              <div class="progress-spinner"></div>
+              <span>Executing Deep All-Seeing Reconnaissance...</span>
+            </div>
+            <div class="progress-percentage" id="progressPercent">0%</div>
+          </div>
+          <div class="progress-bar-container">
+            <div class="progress-bar" id="progressBar"></div>
+          </div>
+          <div class="progress-steps">
+            <div class="progress-step" id="step-phone" data-step="phone">
+              <i class="fas fa-circle-notch fa-spin"></i>
+              <span>Analyzing target phone number, carrier & Truecaller directory...</span>
+            </div>
+            <div class="progress-step" id="step-relatives" data-step="relatives">
+              <i class="far fa-circle"></i>
+              <span>Mapping family relatives, co-habitants & kinship tree OSINT...</span>
+            </div>
+            <div class="progress-step" id="step-exif" data-step="exif">
+              <i class="far fa-circle"></i>
+              <span>Extracting image EXIF camera tags & GPS coordinates...</span>
+            </div>
+            <div class="progress-step" id="step-social" data-step="social">
+              <i class="far fa-circle"></i>
+              <span>Scanning 100+ social, dev, gaming & paste platforms...</span>
+            </div>
+            <div class="progress-step" id="step-web" data-step="web">
+              <i class="far fa-circle"></i>
+              <span>Querying global search & relatives mentions...</span>
+            </div>
+            <div class="progress-step" id="step-ai" data-step="ai">
+              <i class="far fa-circle"></i>
+              <span>Building AI Risk Profile & Multi-Notice Legal Demands...</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="results-section" id="resultsSection">
+      <div class="section-header" style="justify-content: space-between;">
+        <div style="display: flex; align-items: center; gap: 12px;">
+          <div class="section-icon" style="background: var(--gradient-danger);">
+            <i class="fas fa-network-wired"></i>
+          </div>
+          <h2 class="section-title">All-Seeing Footprint & Relatives Dashboard</h2>
+        </div>
+        <div style="display: flex; gap: 10px;">
+          <button class="btn-export" id="printReportBtn" title="Print full PDF report">
+            <i class="fas fa-print"></i> Print PDF Report
+          </button>
+          <button class="btn-export" id="exportJsonBtn" title="Export JSON">
+            <i class="fas fa-file-code"></i> JSON
+          </button>
+          <button class="btn-export" id="exportCsvBtn" title="Export CSV">
+            <i class="fas fa-file-csv"></i> CSV
+          </button>
+          <button class="btn-export" id="newScanBtn" title="New Scan">
+            <i class="fas fa-plus"></i> New Scan
+          </button>
+        </div>
+      </div>
+
+      <div class="stats-bar" id="statsBar">
+        <div class="stat-card">
+          <div class="stat-number" id="statAccounts">0</div>
+          <div class="stat-label">Discovered Accounts</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-number" id="statWebResults">0</div>
+          <div class="stat-label">Web Search Hits</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-number" id="statPlatforms">0</div>
+          <div class="stat-label">Platforms Checked</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-number" id="statRisk">—</div>
+          <div class="stat-label">Exposure Score</div>
+        </div>
+      </div>
+
+      <div class="graph-card" id="graphContainer">
+        <div class="graph-header">
+          <div style="display: flex; align-items: center; gap: 10px;">
+            <i class="fas fa-project-diagram" style="color: var(--accent-cyan); font-size: 18px;"></i>
+            <h3 style="font-size: 16px; font-weight: 700;">Cyber Topology & Kinship Network Graph</h3>
+          </div>
+          <span style="font-size: 12px; color: var(--text-muted);">Interactive Topology Node Graph</span>
+        </div>
+        <canvas id="cyberGraphCanvas" width="1200" height="340"></canvas>
+      </div>
+
+      <div class="filter-bar">
+        <div class="filter-input-wrapper">
+          <i class="fas fa-search"></i>
+          <input type="text" id="accountSearchFilter" placeholder="Filter discovered accounts by keyword or platform..." autocomplete="off">
+        </div>
+        <select id="accountCategoryFilter" class="filter-select">
+          <option value="all">All Categories</option>
+          <option value="developer">Developer & Tech</option>
+          <option value="social">Social Media</option>
+          <option value="professional">Professional</option>
+          <option value="gaming">Gaming</option>
+          <option value="media">Media & Design</option>
+          <option value="blog">Blogging</option>
+          <option value="messaging">Messaging</option>
+        </select>
+      </div>
+
+      <div class="tabs-nav" id="tabsNav">
+        <button class="tab-btn active" data-tab="accounts" id="tabAccounts">
+          <i class="fas fa-users"></i> Accounts <span class="badge" id="badgeAccounts">0</span>
+        </button>
+        <button class="tab-btn" data-tab="phone" id="tabPhone">
+          <i class="fas fa-phone-volume"></i> Phone Recon
+        </button>
+        <button class="tab-btn" data-tab="relatives" id="tabRelatives">
+          <i class="fas fa-people-roof"></i> Relatives & Kinship
+        </button>
+        <button class="tab-btn" data-tab="ai" id="tabAi">
+          <i class="fas fa-brain"></i> AI Exposure & Legal
+        </button>
+        <button class="tab-btn" data-tab="exif" id="tabExif">
+          <i class="fas fa-camera-retro"></i> Photo EXIF GPS
+        </button>
+        <button class="tab-btn" data-tab="dns" id="tabDns">
+          <i class="fas fa-shield-halved"></i> DNS Audit
+        </button>
+        <button class="tab-btn" data-tab="webresults" id="tabWebResults">
+          <i class="fas fa-globe"></i> Web Hits <span class="badge" id="badgeWeb">0</span>
+        </button>
+        <button class="tab-btn" data-tab="breaches" id="tabBreaches">
+          <i class="fas fa-database"></i> Leaks & Breaches
+        </button>
+        <button class="tab-btn" data-tab="databrokers" id="tabDataBrokers">
+          <i class="fas fa-address-card"></i> Data Brokers
+        </button>
+        <button class="tab-btn" data-tab="removal" id="tabRemoval">
+          <i class="fas fa-gavel"></i> Search Removal
+        </button>
+      </div>
+
+      <div class="tab-content active" id="content-accounts">
+        <div class="accounts-grid" id="accountsGrid"></div>
+      </div>
+
+      <div class="tab-content" id="content-phone">
+        <div id="phoneContent"></div>
+      </div>
+
+      <div class="tab-content" id="content-relatives">
+        <div id="relativesContent"></div>
+      </div>
+
+      <div class="tab-content" id="content-ai">
+        <div id="aiAnalysisContent"></div>
+      </div>
+
+      <div class="tab-content" id="content-exif">
+        <div id="exifContent"></div>
+      </div>
+
+      <div class="tab-content" id="content-dns">
+        <div id="dnsContent"></div>
+      </div>
+
+      <div class="tab-content" id="content-webresults">
+        <div class="web-results-list" id="webResultsList"></div>
+      </div>
+
+      <div class="tab-content" id="content-breaches">
+        <div class="links-grid" id="breachesGrid"></div>
+      </div>
+
+      <div class="tab-content" id="content-databrokers">
+        <div class="links-grid" id="dataBrokersGrid"></div>
+      </div>
+
+      <div class="tab-content" id="content-removal">
+        <div class="links-grid" id="removalGrid"></div>
+      </div>
+    </section>
+  </div>
+
+  <div class="modal-overlay" id="deleteModal">
+    <div class="modal-content">
+      <button class="modal-close" id="modalClose"><i class="fas fa-times"></i></button>
+      <h3 class="modal-title" id="modalTitle">Account Deletion Guide</h3>
+      <p class="modal-platform" id="modalPlatform"></p>
+      <div class="modal-instructions" id="modalInstructions"></div>
+      <div class="modal-actions">
+        <a class="modal-btn modal-btn-primary" id="modalDeleteLink" href="#" target="_blank" rel="noopener">
+          <i class="fas fa-external-link-alt"></i> Open Deletion Portal
+        </a>
+        <button class="modal-btn modal-btn-secondary" id="modalCloseBtn">
+          <i class="fas fa-times"></i> Close
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <div class="toast-container" id="toastContainer"></div>
+
+  <script src="app.js"></script>
+</body>
+</html>
