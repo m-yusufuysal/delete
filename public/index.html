@@ -1,0 +1,276 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="TRACE — Digital Footprint Intelligence & Erasure Platform. Scan online presence across 60+ platforms, search engines, breach databases, and request data removals.">
+  <title>TRACE — Digital Footprint Intelligence & Erasure System</title>
+  <link rel="stylesheet" href="styles.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🔍</text></svg>">
+</head>
+<body>
+  <!-- Background Visual Elements -->
+  <div class="bg-grid"></div>
+  <div class="floating-orbs">
+    <div class="orb orb-1"></div>
+    <div class="orb orb-2"></div>
+    <div class="orb orb-3"></div>
+  </div>
+
+  <div class="app-container">
+    <!-- Header -->
+    <header class="header" id="header">
+      <div class="header-brand">
+        <div class="brand-icon">🔍</div>
+        <div>
+          <div class="brand-title">TRACE</div>
+          <div class="brand-subtitle">Digital Footprint Intelligence & Erasure</div>
+        </div>
+      </div>
+      <div class="header-status">
+        <div class="status-dot"></div>
+        <span class="status-text">System Active — 60+ Platforms & AI Intelligence</span>
+      </div>
+    </header>
+
+    <!-- Scan Form Section -->
+    <section class="scan-section" id="scanSection">
+      <div class="section-header">
+        <div class="section-icon"><i class="fas fa-crosshairs"></i></div>
+        <h1 class="section-title">Initiate Footprint Scan</h1>
+      </div>
+
+      <div class="scan-form-card">
+        <form id="scanForm" enctype="multipart/form-data">
+          <div class="form-grid">
+            <div class="form-group">
+              <label class="form-label" for="nameInput">
+                <i class="fas fa-user"></i> Full Name
+              </label>
+              <input type="text" id="nameInput" name="name" class="form-input" 
+                     placeholder="e.g. John Doe" autocomplete="off">
+            </div>
+
+            <div class="form-group">
+              <label class="form-label" for="emailInput">
+                <i class="fas fa-envelope"></i> Email Address
+              </label>
+              <input type="email" id="emailInput" name="email" class="form-input" 
+                     placeholder="e.g. john@example.com" autocomplete="off">
+            </div>
+
+            <div class="form-group">
+              <label class="form-label" for="usernamesInput">
+                <i class="fas fa-at"></i> Custom Usernames / Aliases
+              </label>
+              <input type="text" id="usernamesInput" name="customUsernames" class="form-input" 
+                     placeholder="Comma separated: johndoe42, j.doe" autocomplete="off">
+            </div>
+
+            <div class="form-group">
+              <label class="form-label">
+                <i class="fas fa-image"></i> Target Photo (Optional)
+              </label>
+              <div class="image-upload-zone" id="imageDropZone">
+                <i class="fas fa-cloud-upload-alt"></i>
+                <p>Drag & drop or click to upload</p>
+                <p class="upload-hint">PNG, JPG, WEBP — Max 15MB</p>
+                <input type="file" id="imageInput" name="image" accept="image/*" style="display: none;">
+              </div>
+              <div class="image-preview-container" id="imagePreviewContainer">
+                <img class="image-preview" id="imagePreview" alt="Target preview">
+                <div class="image-preview-info">
+                  <div class="image-preview-name" id="imageFileName">image.jpg</div>
+                  <div class="image-preview-size" id="imageFileSize">0 KB</div>
+                </div>
+                <button type="button" class="btn-remove-image" id="removeImageBtn">
+                  <i class="fas fa-times"></i> Remove
+                </button>
+              </div>
+            </div>
+          </div>
+
+          <div class="form-actions">
+            <button type="submit" class="btn-scan" id="scanBtn">
+              <i class="fas fa-radar" id="scanBtnIcon"></i>
+              <span id="scanBtnText">Execute Deep Scan</span>
+            </button>
+            <button type="button" class="btn-clear" id="clearBtn">
+              <i class="fas fa-eraser"></i> Clear Form
+            </button>
+          </div>
+        </form>
+
+        <!-- Scan Progress Bar -->
+        <div class="scan-progress" id="scanProgress">
+          <div class="progress-header">
+            <div class="progress-title">
+              <div class="progress-spinner"></div>
+              <span>Scanning Intelligence Target...</span>
+            </div>
+            <div class="progress-percentage" id="progressPercent">0%</div>
+          </div>
+          <div class="progress-bar-container">
+            <div class="progress-bar" id="progressBar"></div>
+          </div>
+          <div class="progress-steps">
+            <div class="progress-step" id="step-social" data-step="social">
+              <i class="fas fa-circle-notch fa-spin"></i>
+              <span>Scanning 60+ social media & developer platforms...</span>
+            </div>
+            <div class="progress-step" id="step-web" data-step="web">
+              <i class="far fa-circle"></i>
+              <span>Querying global web search & indexed articles...</span>
+            </div>
+            <div class="progress-step" id="step-email" data-step="email">
+              <i class="far fa-circle"></i>
+              <span>Checking Gravatar & email service profiles...</span>
+            </div>
+            <div class="progress-step" id="step-breach" data-step="breach">
+              <i class="far fa-circle"></i>
+              <span>Checking credential breach databases...</span>
+            </div>
+            <div class="progress-step" id="step-ai" data-step="ai">
+              <i class="far fa-circle"></i>
+              <span>Running AI threat score & legal draft generator...</span>
+            </div>
+            <div class="progress-step" id="step-complete" data-step="complete">
+              <i class="far fa-circle"></i>
+              <span>Finalizing intelligence report...</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Results Section -->
+    <section class="results-section" id="resultsSection">
+      <!-- Section Header -->
+      <div class="section-header" style="justify-content: space-between;">
+        <div style="display: flex; align-items: center; gap: 12px;">
+          <div class="section-icon" style="background: var(--gradient-danger);">
+            <i class="fas fa-chart-network"></i>
+          </div>
+          <h2 class="section-title">Intelligence & Footprint Dashboard</h2>
+        </div>
+        <div style="display: flex; gap: 10px;">
+          <button class="btn-export" id="exportJsonBtn" title="Export as JSON report">
+            <i class="fas fa-file-code"></i> JSON Report
+          </button>
+          <button class="btn-export" id="exportCsvBtn" title="Export as CSV spreadsheet">
+            <i class="fas fa-file-csv"></i> CSV Report
+          </button>
+          <button class="btn-export" id="newScanBtn" title="Initiate another scan">
+            <i class="fas fa-plus"></i> New Scan
+          </button>
+        </div>
+      </div>
+
+      <!-- Statistics Bar -->
+      <div class="stats-bar" id="statsBar">
+        <div class="stat-card">
+          <div class="stat-number" id="statAccounts">0</div>
+          <div class="stat-label">Discovered Accounts</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-number" id="statWebResults">0</div>
+          <div class="stat-label">Web Search Hits</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-number" id="statPlatforms">0</div>
+          <div class="stat-label">Platforms Checked</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-number" id="statRisk">—</div>
+          <div class="stat-label">Exposure Score</div>
+        </div>
+      </div>
+
+      <!-- Tab Navigation -->
+      <div class="tabs-nav" id="tabsNav">
+        <button class="tab-btn active" data-tab="accounts" id="tabAccounts">
+          <i class="fas fa-users"></i> Accounts <span class="badge" id="badgeAccounts">0</span>
+        </button>
+        <button class="tab-btn" data-tab="ai" id="tabAi">
+          <i class="fas fa-robot"></i> AI Risk & Legal
+        </button>
+        <button class="tab-btn" data-tab="webresults" id="tabWebResults">
+          <i class="fas fa-globe"></i> Web Hits <span class="badge" id="badgeWeb">0</span>
+        </button>
+        <button class="tab-btn" data-tab="breaches" id="tabBreaches">
+          <i class="fas fa-shield-alt"></i> Data Breaches
+        </button>
+        <button class="tab-btn" data-tab="databrokers" id="tabDataBrokers">
+          <i class="fas fa-address-card"></i> Data Brokers
+        </button>
+        <button class="tab-btn" data-tab="removal" id="tabRemoval">
+          <i class="fas fa-gavel"></i> Search Removal
+        </button>
+        <button class="tab-btn" data-tab="imagesearch" id="tabImageSearch">
+          <i class="fas fa-camera"></i> Visual Lens
+        </button>
+        <button class="tab-btn" data-tab="whois" id="tabWhois">
+          <i class="fas fa-server"></i> WHOIS
+        </button>
+      </div>
+
+      <!-- Tab Contents -->
+      <div class="tab-content active" id="content-accounts">
+        <div class="accounts-grid" id="accountsGrid"></div>
+      </div>
+
+      <div class="tab-content" id="content-ai">
+        <div id="aiAnalysisContent"></div>
+      </div>
+
+      <div class="tab-content" id="content-webresults">
+        <div class="web-results-list" id="webResultsList"></div>
+      </div>
+
+      <div class="tab-content" id="content-breaches">
+        <div class="links-grid" id="breachesGrid"></div>
+      </div>
+
+      <div class="tab-content" id="content-databrokers">
+        <div class="links-grid" id="dataBrokersGrid"></div>
+      </div>
+
+      <div class="tab-content" id="content-removal">
+        <div class="links-grid" id="removalGrid"></div>
+      </div>
+
+      <div class="tab-content" id="content-imagesearch">
+        <div id="imageSearchContent"></div>
+      </div>
+
+      <div class="tab-content" id="content-whois">
+        <div id="whoisContent"></div>
+      </div>
+    </section>
+  </div>
+
+  <!-- Account Deletion Instructions Modal -->
+  <div class="modal-overlay" id="deleteModal">
+    <div class="modal-content">
+      <button class="modal-close" id="modalClose"><i class="fas fa-times"></i></button>
+      <h3 class="modal-title" id="modalTitle">Account Deletion Guide</h3>
+      <p class="modal-platform" id="modalPlatform"></p>
+      <div class="modal-instructions" id="modalInstructions"></div>
+      <div class="modal-actions">
+        <a class="modal-btn modal-btn-primary" id="modalDeleteLink" href="#" target="_blank" rel="noopener">
+          <i class="fas fa-external-link-alt"></i> Open Deletion Page
+        </a>
+        <button class="modal-btn modal-btn-secondary" id="modalCloseBtn">
+          <i class="fas fa-times"></i> Close
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Toast Notification Container -->
+  <div class="toast-container" id="toastContainer"></div>
+
+  <script src="app.js"></script>
+</body>
+</html>
