@@ -107,15 +107,24 @@ function generateUsernames(name) {
   const first = parts[0];
   const last = parts[parts.length - 1];
   
-  usernames.add(first);
-  usernames.add(last);
+  // Specific full combinations
   usernames.add(`${first}${last}`);
   usernames.add(`${first}.${last}`);
   usernames.add(`${first}_${last}`);
   usernames.add(`${first}-${last}`);
   usernames.add(`${last}${first}`);
-  usernames.add(`${first}${last[0]}`);
+  usernames.add(`${last}.${first}`);
+  usernames.add(`${last}_${first}`);
   usernames.add(`${first[0]}${last}`);
+  usernames.add(`${first[0]}.${last}`);
+  usernames.add(`${first[0]}_${last}`);
+  usernames.add(`${first}${last[0]}`);
+
+  // Common Turkish prefix variation (e.g. m-yusufuysal for Muhammed/Mehmet)
+  usernames.add(`m-${first}${last}`);
+  usernames.add(`m${first}${last}`);
+  usernames.add(`m.${first}${last}`);
+  usernames.add(`m_${first}${last}`);
   
   return [...usernames];
 }

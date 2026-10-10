@@ -205,11 +205,16 @@
     if (name) {
       const parts = name.toLowerCase().replace(/[^a-z0-9\s]/g, '').trim().split(/\s+/);
       if (parts.length > 0) {
-        usernames.add(parts[0]);
-        usernames.add(parts[parts.length - 1]);
-        usernames.add(`${parts[0]}${parts[parts.length - 1]}`);
-        usernames.add(`${parts[0]}.${parts[parts.length - 1]}`);
-        usernames.add(`${parts[0]}_${parts[parts.length - 1]}`);
+        const first = parts[0];
+        const last = parts[parts.length - 1];
+        usernames.add(`${first}${last}`);
+        usernames.add(`${first}.${last}`);
+        usernames.add(`${first}_${last}`);
+        usernames.add(`${first}-${last}`);
+        usernames.add(`${last}${first}`);
+        usernames.add(`${first[0]}${last}`);
+        usernames.add(`m-${first}${last}`);
+        usernames.add(`m${first}${last}`);
       }
     }
     if (email && email.includes('@')) {
